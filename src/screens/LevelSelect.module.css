@@ -55,7 +55,7 @@
 
 .completed {
   border-color: var(--color-success) !important;
-  background: rgba(6, 214, 160, 0.08) !important;
+  background: rgba(22, 163, 74, 0.08) !important;
 }
 
 .locked {

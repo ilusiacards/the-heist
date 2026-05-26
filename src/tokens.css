@@ -3,24 +3,24 @@
   --font-body: 'Nunito', system-ui, sans-serif;
 
   /* Colors */
-  --color-bg: #1a1a2e;
-  --color-surface: #16213e;
-  --color-surface-alt: #0f3460;
-  --color-border: #2a2a4a;
-  --color-text: #e0e0f0;
-  --color-text-muted: #888aaa;
-  --color-accent: #e94560;
-  --color-accent-hover: #ff6b81;
-  --color-success: #06d6a0;
-  --color-warning: #ffd166;
-  --color-danger: #ef476f;
+  --color-bg: #fef9f0;
+  --color-surface: #fffcf5;
+  --color-surface-alt: #fef3c7;
+  --color-border: #e2cfa3;
+  --color-text: #292524;
+  --color-text-muted: #78716c;
+  --color-accent: #d97706;
+  --color-accent-hover: #b45309;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
 
   /* Board */
-  --color-cell-bg: #1e1e3a;
-  --color-cell-hover: #2a2a4e;
-  --color-cell-glow: #06d6a0;
-  --color-cell-eliminated: #0f0f1e;
-  --color-room-border: rgba(255,255,255,0.12);
+  --color-cell-bg: #fffbf2;
+  --color-cell-hover: #fef3c7;
+  --color-cell-glow: #16a34a;
+  --color-cell-eliminated: #f5ede0;
+  --color-room-border: #92400e;
 
   /* Spacing */
   --space-xs: 4px;
@@ -35,9 +35,9 @@
   --radius-lg: 12px;
 
   /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
-  --shadow-glow: 0 0 16px rgba(6,214,160,0.5);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 16px rgba(22,163,74,0.4);
 
   /* Transitions */
   --transition-fast: 150ms ease;

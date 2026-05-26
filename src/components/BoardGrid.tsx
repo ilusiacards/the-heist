@@ -22,6 +22,8 @@ function getPlacedChar(cellId: CellId, placement: Partial<Record<string, CellId>
   return null
 }
 
+const ROOM_TINTS = ['#fff7ed', '#fdf4ff', '#f0fdf4', '#eff6ff', '#fefce8']
+
 function roomBorderStyle(cell: Cell, board: Board): React.CSSProperties {
   const style: React.CSSProperties = {}
   const getNeighbor = (r: number, c: number) =>
@@ -34,13 +36,15 @@ function roomBorderStyle(cell: Cell, board: Board): React.CSSProperties {
   const left = getNeighbor(cell.row, cell.col - 1)
   const right = getNeighbor(cell.row, cell.col + 1)
 
-  const borderColor = 'rgba(255,255,255,0.35)'
-  const normalColor = 'rgba(255,255,255,0.08)'
+  const roomIdx = board.rooms.findIndex(r => r.id === cell.roomId)
+  style.background = ROOM_TINTS[roomIdx % ROOM_TINTS.length]
 
-  style.borderTopColor = !top || top.roomId !== cell.roomId ? borderColor : normalColor
-  style.borderBottomColor = !bottom || bottom.roomId !== cell.roomId ? borderColor : normalColor
-  style.borderLeftColor = !left || left.roomId !== cell.roomId ? borderColor : normalColor
-  style.borderRightColor = !right || right.roomId !== cell.roomId ? borderColor : normalColor
+  const roomEdge = (isDiff: boolean) => isDiff ? '2px solid #92400e' : '1px solid #e2cfa3'
+
+  style.borderTop = roomEdge(!top || top.roomId !== cell.roomId)
+  style.borderBottom = roomEdge(!bottom || bottom.roomId !== cell.roomId)
+  style.borderLeft = roomEdge(!left || left.roomId !== cell.roomId)
+  style.borderRight = roomEdge(!right || right.roomId !== cell.roomId)
 
   return style
 }
