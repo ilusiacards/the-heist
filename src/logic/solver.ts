@@ -85,11 +85,6 @@ function solve(
     return
   }
 
-  // Watchdog: excessive backtracking
-  if (depth > characters.length * 3) {
-    console.warn(`[solver] backtrack depth ${depth} exceeds watchdog threshold`)
-  }
-
   const myCandidates = candidates[charId] ?? new Set<CellId>()
   for (const cellId of myCandidates) {
     const newPlacement = { ...placement, [charId]: cellId }

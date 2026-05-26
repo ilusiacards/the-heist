@@ -8,6 +8,8 @@ const CHARACTER_COLORS = [
   '#9f1239', // rose-900
   '#7c2d12', // orange-900
   '#1e1b4b', // indigo-950
+  '#065f46', // emerald-800
+  '#4a044e', // fuchsia-950
 ]
 
 export function getCharacterColor(characterId: string, characters: Array<{ id: string }>): string {

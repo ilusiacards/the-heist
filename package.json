@@ -11,8 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "generate": "bun run scripts/generate.ts",
-    "prebuild": "bun run generate"
+    "generate": "bun run scripts/generate.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

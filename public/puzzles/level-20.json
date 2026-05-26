@@ -1,10 +1,10 @@
 {
-  "id": "level-10011",
+  "id": "level-20",
   "level": 20,
   "difficulty": "medium",
   "board": {
-    "rows": 5,
-    "cols": 5,
+    "rows": 7,
+    "cols": 7,
     "cells": [
       [
         {
@@ -12,35 +12,53 @@
           "row": 0,
           "col": 0,
           "roomId": "room-0",
-          "windows": []
+          "windows": [],
+          "object": "planta"
         },
         {
           "id": "F0C1",
           "row": 0,
           "col": 1,
-          "roomId": "room-0",
+          "roomId": "room-3",
           "windows": []
         },
         {
           "id": "F0C2",
           "row": 0,
           "col": 2,
-          "roomId": "room-0",
+          "roomId": "room-3",
           "windows": []
         },
         {
           "id": "F0C3",
           "row": 0,
           "col": 3,
-          "roomId": "room-3",
-          "windows": [],
-          "object": "tv"
+          "roomId": "room-1",
+          "windows": []
         },
         {
           "id": "F0C4",
           "row": 0,
           "col": 4,
-          "roomId": "room-2",
+          "roomId": "room-1",
+          "windows": [
+            "top"
+          ]
+        },
+        {
+          "id": "F0C5",
+          "row": 0,
+          "col": 5,
+          "roomId": "room-1",
+          "windows": [
+            "top"
+          ]
+        },
+        {
+          "id": "F0C6",
+          "row": 0,
+          "col": 6,
+          "roomId": "room-1",
           "windows": []
         }
       ],
@@ -49,14 +67,15 @@
           "id": "F1C0",
           "row": 1,
           "col": 0,
-          "roomId": "room-4",
-          "windows": []
+          "roomId": "room-0",
+          "windows": [],
+          "object": "planta"
         },
         {
           "id": "F1C1",
           "row": 1,
           "col": 1,
-          "roomId": "room-0",
+          "roomId": "room-3",
           "windows": []
         },
         {
@@ -70,17 +89,32 @@
           "id": "F1C3",
           "row": 1,
           "col": 3,
-          "roomId": "room-3",
-          "windows": []
+          "roomId": "room-1",
+          "windows": [],
+          "object": "alfombra"
         },
         {
           "id": "F1C4",
           "row": 1,
           "col": 4,
-          "roomId": "room-2",
-          "windows": [
-            "right"
-          ]
+          "roomId": "room-1",
+          "windows": [],
+          "object": "estanteria"
+        },
+        {
+          "id": "F1C5",
+          "row": 1,
+          "col": 5,
+          "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F1C6",
+          "row": 1,
+          "col": 6,
+          "roomId": "room-1",
+          "windows": [],
+          "object": "tv"
         }
       ],
       [
@@ -88,18 +122,15 @@
           "id": "F2C0",
           "row": 2,
           "col": 0,
-          "roomId": "room-4",
-          "windows": [
-            "left"
-          ]
+          "roomId": "room-0",
+          "windows": []
         },
         {
           "id": "F2C1",
           "row": 2,
           "col": 1,
-          "roomId": "room-0",
-          "windows": [],
-          "object": "tv"
+          "roomId": "room-3",
+          "windows": []
         },
         {
           "id": "F2C2",
@@ -113,16 +144,29 @@
           "row": 2,
           "col": 3,
           "roomId": "room-3",
-          "windows": [],
-          "object": "estanteria"
+          "windows": []
         },
         {
           "id": "F2C4",
           "row": 2,
           "col": 4,
           "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F2C5",
+          "row": 2,
+          "col": 5,
+          "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F2C6",
+          "row": 2,
+          "col": 6,
+          "roomId": "room-1",
           "windows": [],
-          "object": "planta"
+          "object": "caja"
         }
       ],
       [
@@ -130,39 +174,55 @@
           "id": "F3C0",
           "row": 3,
           "col": 0,
-          "roomId": "room-4",
+          "roomId": "room-0",
           "windows": []
         },
         {
           "id": "F3C1",
           "row": 3,
           "col": 1,
-          "roomId": "room-0",
+          "roomId": "room-3",
           "windows": []
         },
         {
           "id": "F3C2",
           "row": 3,
           "col": 2,
-          "roomId": "room-1",
-          "windows": []
+          "roomId": "room-3",
+          "windows": [],
+          "object": "planta"
         },
         {
           "id": "F3C3",
           "row": 3,
           "col": 3,
-          "roomId": "room-1",
-          "windows": []
+          "roomId": "room-2",
+          "windows": [],
+          "object": "tv"
         },
         {
           "id": "F3C4",
           "row": 3,
           "col": 4,
-          "roomId": "room-1",
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F3C5",
+          "row": 3,
+          "col": 5,
+          "roomId": "room-2",
+          "windows": [],
+          "object": "alfombra"
+        },
+        {
+          "id": "F3C6",
+          "row": 3,
+          "col": 6,
+          "roomId": "room-2",
           "windows": [
             "right"
-          ],
-          "object": "alfombra"
+          ]
         }
       ],
       [
@@ -171,40 +231,170 @@
           "row": 4,
           "col": 0,
           "roomId": "room-4",
-          "windows": []
+          "windows": [],
+          "object": "cama"
         },
         {
           "id": "F4C1",
           "row": 4,
           "col": 1,
-          "roomId": "room-0",
-          "windows": []
+          "roomId": "room-4",
+          "windows": [],
+          "object": "planta"
         },
         {
           "id": "F4C2",
           "row": 4,
           "col": 2,
-          "roomId": "room-1",
+          "roomId": "room-4",
           "windows": [],
-          "object": "silla"
+          "object": "alfombra"
         },
         {
           "id": "F4C3",
           "row": 4,
           "col": 3,
-          "roomId": "room-1",
+          "roomId": "room-2",
           "windows": []
         },
         {
           "id": "F4C4",
           "row": 4,
           "col": 4,
-          "roomId": "room-1",
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F4C5",
+          "row": 4,
+          "col": 5,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F4C6",
+          "row": 4,
+          "col": 6,
+          "roomId": "room-2",
+          "windows": [
+            "right"
+          ],
+          "object": "tv"
+        }
+      ],
+      [
+        {
+          "id": "F5C0",
+          "row": 5,
+          "col": 0,
+          "roomId": "room-4",
+          "windows": []
+        },
+        {
+          "id": "F5C1",
+          "row": 5,
+          "col": 1,
+          "roomId": "room-4",
+          "windows": [],
+          "object": "estanteria"
+        },
+        {
+          "id": "F5C2",
+          "row": 5,
+          "col": 2,
+          "roomId": "room-4",
+          "windows": [],
+          "object": "cama"
+        },
+        {
+          "id": "F5C3",
+          "row": 5,
+          "col": 3,
+          "roomId": "room-2",
+          "windows": [],
+          "object": "silla"
+        },
+        {
+          "id": "F5C4",
+          "row": 5,
+          "col": 4,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F5C5",
+          "row": 5,
+          "col": 5,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F5C6",
+          "row": 5,
+          "col": 6,
+          "roomId": "room-2",
+          "windows": []
+        }
+      ],
+      [
+        {
+          "id": "F6C0",
+          "row": 6,
+          "col": 0,
+          "roomId": "room-4",
+          "windows": [
+            "bottom",
+            "left"
+          ]
+        },
+        {
+          "id": "F6C1",
+          "row": 6,
+          "col": 1,
+          "roomId": "room-4",
+          "windows": [
+            "bottom"
+          ]
+        },
+        {
+          "id": "F6C2",
+          "row": 6,
+          "col": 2,
+          "roomId": "room-4",
+          "windows": []
+        },
+        {
+          "id": "F6C3",
+          "row": 6,
+          "col": 3,
+          "roomId": "room-2",
+          "windows": [
+            "bottom"
+          ]
+        },
+        {
+          "id": "F6C4",
+          "row": 6,
+          "col": 4,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F6C5",
+          "row": 6,
+          "col": 5,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F6C6",
+          "row": 6,
+          "col": 6,
+          "roomId": "room-2",
           "windows": [
             "bottom",
             "right"
-          ],
-          "object": "estanteria"
+          ]
         }
       ]
     ],
@@ -214,54 +404,78 @@
         "name": "Dormitorio",
         "cells": [
           "F0C0",
-          "F0C1",
-          "F0C2",
-          "F1C1",
-          "F2C1",
-          "F3C1",
-          "F4C1"
+          "F1C0",
+          "F2C0",
+          "F3C0"
         ]
       },
       {
         "id": "room-1",
         "name": "Cocina",
         "cells": [
+          "F0C3",
+          "F0C4",
+          "F0C5",
+          "F0C6",
+          "F1C3",
+          "F1C4",
+          "F1C5",
+          "F1C6",
           "F2C4",
-          "F3C2",
-          "F3C3",
-          "F3C4",
-          "F4C2",
-          "F4C3",
-          "F4C4"
+          "F2C5",
+          "F2C6"
         ]
       },
       {
         "id": "room-2",
         "name": "Sala",
         "cells": [
-          "F0C4",
-          "F1C4"
+          "F3C3",
+          "F3C4",
+          "F3C5",
+          "F3C6",
+          "F4C3",
+          "F4C4",
+          "F4C5",
+          "F4C6",
+          "F5C3",
+          "F5C4",
+          "F5C5",
+          "F5C6",
+          "F6C3",
+          "F6C4",
+          "F6C5",
+          "F6C6"
         ]
       },
       {
         "id": "room-3",
         "name": "Baño",
         "cells": [
-          "F0C3",
+          "F0C1",
+          "F0C2",
+          "F1C1",
           "F1C2",
-          "F1C3",
+          "F2C1",
           "F2C2",
-          "F2C3"
+          "F2C3",
+          "F3C1",
+          "F3C2"
         ]
       },
       {
         "id": "room-4",
         "name": "Biblioteca",
         "cells": [
-          "F1C0",
-          "F2C0",
-          "F3C0",
-          "F4C0"
+          "F4C0",
+          "F4C1",
+          "F4C2",
+          "F5C0",
+          "F5C1",
+          "F5C2",
+          "F6C0",
+          "F6C1",
+          "F6C2"
         ]
       }
     ]
@@ -269,64 +483,132 @@
   "characters": [
     {
       "id": "char-0",
-      "name": "Marcos"
+      "name": "Elena"
     },
     {
       "id": "char-1",
-      "name": "Sofía"
+      "name": "Bruno"
     },
     {
       "id": "char-2",
-      "name": "Pablo"
+      "name": "Ana"
     },
     {
       "id": "char-3",
-      "name": "Andrés"
+      "name": "Julia"
+    },
+    {
+      "id": "char-4",
+      "name": "Lola"
+    },
+    {
+      "id": "char-5",
+      "name": "Iván"
+    },
+    {
+      "id": "char-6",
+      "name": "Gara"
     }
   ],
   "clues": [
     {
-      "id": "clue-4",
+      "id": "clue-9",
       "type": "same_room_as",
-      "subject": "char-3",
+      "subject": "char-1",
       "params": {
-        "otherId": "char-1"
+        "otherId": "char-6"
       }
     },
     {
-      "id": "clue-36",
+      "id": "clue-73",
       "type": "not_same_room_as",
-      "subject": "char-0",
+      "subject": "char-3",
+      "params": {
+        "otherId": "char-5"
+      }
+    },
+    {
+      "id": "clue-138",
+      "type": "not_same_room_as",
+      "subject": "char-2",
+      "params": {
+        "otherId": "char-4"
+      }
+    },
+    {
+      "id": "clue-204",
+      "type": "same_room_as",
+      "subject": "char-6",
       "params": {
         "otherId": "char-2"
       }
     },
     {
-      "id": "clue-70",
+      "id": "clue-267",
+      "type": "not_same_room_as",
+      "subject": "char-3",
+      "params": {
+        "otherId": "char-0"
+      }
+    },
+    {
+      "id": "clue-350",
       "type": "on_object",
-      "subject": "char-1",
+      "subject": "char-6",
       "params": {
         "objectType": "silla"
       }
     },
     {
-      "id": "clue-94",
-      "type": "in_room",
-      "subject": "char-2",
+      "id": "clue-411",
+      "type": "not_same_room_as",
+      "subject": "char-0",
       "params": {
-        "roomId": "room-2"
+        "otherId": "char-4"
       }
     },
     {
-      "id": "clue-101",
+      "id": "clue-468",
+      "type": "not_same_room_as",
+      "subject": "char-1",
+      "params": {
+        "otherId": "char-3"
+      }
+    },
+    {
+      "id": "clue-558",
+      "type": "on_object",
+      "subject": "char-1",
+      "params": {
+        "objectType": "alfombra"
+      }
+    },
+    {
+      "id": "clue-608",
+      "type": "not_same_room_as",
+      "subject": "char-5",
+      "params": {
+        "otherId": "char-0"
+      }
+    },
+    {
+      "id": "clue-689",
       "type": "in_corner",
-      "subject": "char-2",
+      "subject": "char-0",
       "params": {}
     },
     {
-      "id": "clue-144",
+      "id": "clue-774",
+      "type": "on_object",
+      "subject": "char-5",
+      "params": {
+        "objectType": "alfombra"
+      }
+    },
+    {
+      "id": "clue-811",
       "type": "in_room",
-      "subject": "char-0",
+      "subject": "char-4",
       "params": {
         "roomId": "room-0"
       }
@@ -334,12 +616,15 @@
   ],
   "solution": {
     "placement": {
-      "char-0": "F1C1",
-      "char-1": "F4C2",
-      "char-2": "F0C4",
-      "char-3": "F3C3"
+      "char-0": "F0C6",
+      "char-1": "F3C5",
+      "char-2": "F6C4",
+      "char-3": "F1C1",
+      "char-4": "F2C0",
+      "char-5": "F4C2",
+      "char-6": "F5C3"
     },
     "culpritId": "char-0",
-    "stolenObjectCellId": "F3C1"
+    "stolenObjectCellId": "F1C5"
   }
 }
