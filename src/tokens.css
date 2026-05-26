@@ -1,0 +1,45 @@
+:root {
+  /* Typography */
+  --font-body: 'Nunito', system-ui, sans-serif;
+
+  /* Colors */
+  --color-bg: #1a1a2e;
+  --color-surface: #16213e;
+  --color-surface-alt: #0f3460;
+  --color-border: #2a2a4a;
+  --color-text: #e0e0f0;
+  --color-text-muted: #888aaa;
+  --color-accent: #e94560;
+  --color-accent-hover: #ff6b81;
+  --color-success: #06d6a0;
+  --color-warning: #ffd166;
+  --color-danger: #ef476f;
+
+  /* Board */
+  --color-cell-bg: #1e1e3a;
+  --color-cell-hover: #2a2a4e;
+  --color-cell-glow: #06d6a0;
+  --color-cell-eliminated: #0f0f1e;
+  --color-room-border: rgba(255,255,255,0.12);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 16px rgba(6,214,160,0.5);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}

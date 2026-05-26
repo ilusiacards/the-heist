@@ -1,0 +1,253 @@
+{
+  "id": "level-10",
+  "level": 8,
+  "difficulty": "easy",
+  "board": {
+    "rows": 4,
+    "cols": 4,
+    "cells": [
+      [
+        {
+          "id": "F0C0",
+          "row": 0,
+          "col": 0,
+          "roomId": "room-2",
+          "windows": [
+            "top",
+            "left"
+          ]
+        },
+        {
+          "id": "F0C1",
+          "row": 0,
+          "col": 1,
+          "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F0C2",
+          "row": 0,
+          "col": 2,
+          "roomId": "room-1",
+          "windows": [],
+          "object": "estanteria"
+        },
+        {
+          "id": "F0C3",
+          "row": 0,
+          "col": 3,
+          "roomId": "room-0",
+          "windows": [
+            "top",
+            "right"
+          ]
+        }
+      ],
+      [
+        {
+          "id": "F1C0",
+          "row": 1,
+          "col": 0,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F1C1",
+          "row": 1,
+          "col": 1,
+          "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F1C2",
+          "row": 1,
+          "col": 2,
+          "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F1C3",
+          "row": 1,
+          "col": 3,
+          "roomId": "room-0",
+          "windows": [],
+          "object": "caja"
+        }
+      ],
+      [
+        {
+          "id": "F2C0",
+          "row": 2,
+          "col": 0,
+          "roomId": "room-2",
+          "windows": [],
+          "object": "cama"
+        },
+        {
+          "id": "F2C1",
+          "row": 2,
+          "col": 1,
+          "roomId": "room-1",
+          "windows": [],
+          "object": "silla"
+        },
+        {
+          "id": "F2C2",
+          "row": 2,
+          "col": 2,
+          "roomId": "room-1",
+          "windows": [],
+          "object": "estanteria"
+        },
+        {
+          "id": "F2C3",
+          "row": 2,
+          "col": 3,
+          "roomId": "room-0",
+          "windows": []
+        }
+      ],
+      [
+        {
+          "id": "F3C0",
+          "row": 3,
+          "col": 0,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F3C1",
+          "row": 3,
+          "col": 1,
+          "roomId": "room-0",
+          "windows": []
+        },
+        {
+          "id": "F3C2",
+          "row": 3,
+          "col": 2,
+          "roomId": "room-0",
+          "windows": []
+        },
+        {
+          "id": "F3C3",
+          "row": 3,
+          "col": 3,
+          "roomId": "room-0",
+          "windows": []
+        }
+      ]
+    ],
+    "rooms": [
+      {
+        "id": "room-0",
+        "name": "Dormitorio",
+        "cells": [
+          "F0C3",
+          "F1C3",
+          "F2C3",
+          "F3C1",
+          "F3C2",
+          "F3C3"
+        ]
+      },
+      {
+        "id": "room-1",
+        "name": "Cocina",
+        "cells": [
+          "F0C1",
+          "F0C2",
+          "F1C1",
+          "F1C2",
+          "F2C1",
+          "F2C2"
+        ]
+      },
+      {
+        "id": "room-2",
+        "name": "Sala",
+        "cells": [
+          "F0C0",
+          "F1C0",
+          "F2C0",
+          "F3C0"
+        ]
+      }
+    ]
+  },
+  "characters": [
+    {
+      "id": "char-0",
+      "name": "Diego"
+    },
+    {
+      "id": "char-1",
+      "name": "Isabella"
+    },
+    {
+      "id": "char-2",
+      "name": "Elena"
+    }
+  ],
+  "clues": [
+    {
+      "id": "clue-12",
+      "type": "on_object",
+      "subject": "char-2",
+      "params": {
+        "objectType": "silla"
+      }
+    },
+    {
+      "id": "clue-21",
+      "type": "not_same_room_as",
+      "subject": "char-2",
+      "params": {
+        "otherId": "char-1"
+      }
+    },
+    {
+      "id": "clue-43",
+      "type": "in_room",
+      "subject": "char-1",
+      "params": {
+        "roomId": "room-2"
+      }
+    },
+    {
+      "id": "clue-50",
+      "type": "not_next_to_window",
+      "subject": "char-0",
+      "params": {}
+    },
+    {
+      "id": "clue-73",
+      "type": "not_same_room_as",
+      "subject": "char-2",
+      "params": {
+        "otherId": "char-0"
+      }
+    },
+    {
+      "id": "clue-81",
+      "type": "in_corner",
+      "subject": "char-0",
+      "params": {}
+    },
+    {
+      "id": "clue-103",
+      "type": "not_in_corner",
+      "subject": "char-1",
+      "params": {}
+    }
+  ],
+  "solution": {
+    "placement": {
+      "char-0": "F3C3",
+      "char-1": "F1C0",
+      "char-2": "F2C1"
+    },
+    "culpritId": "char-0",
+    "stolenObjectCellId": "F2C3"
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "id": "level-12",
+  "level": 10,
+  "difficulty": "easy",
+  "board": {
+    "rows": 4,
+    "cols": 4,
+    "cells": [
+      [
+        {
+          "id": "F0C0",
+          "row": 0,
+          "col": 0,
+          "roomId": "room-0",
+          "windows": []
+        },
+        {
+          "id": "F0C1",
+          "row": 0,
+          "col": 1,
+          "roomId": "room-0",
+          "windows": []
+        },
+        {
+          "id": "F0C2",
+          "row": 0,
+          "col": 2,
+          "roomId": "room-0",
+          "windows": []
+        },
+        {
+          "id": "F0C3",
+          "row": 0,
+          "col": 3,
+          "roomId": "room-2",
+          "windows": []
+        }
+      ],
+      [
+        {
+          "id": "F1C0",
+          "row": 1,
+          "col": 0,
+          "roomId": "room-0",
+          "windows": []
+        },
+        {
+          "id": "F1C1",
+          "row": 1,
+          "col": 1,
+          "roomId": "room-0",
+          "windows": [],
+          "object": "tv"
+        },
+        {
+          "id": "F1C2",
+          "row": 1,
+          "col": 2,
+          "roomId": "room-2",
+          "windows": []
+        },
+        {
+          "id": "F1C3",
+          "row": 1,
+          "col": 3,
+          "roomId": "room-2",
+          "windows": [],
+          "object": "silla"
+        }
+      ],
+      [
+        {
+          "id": "F2C0",
+          "row": 2,
+          "col": 0,
+          "roomId": "room-3",
+          "windows": []
+        },
+        {
+          "id": "F2C1",
+          "row": 2,
+          "col": 1,
+          "roomId": "room-3",
+          "windows": [],
+          "object": "cama"
+        },
+        {
+          "id": "F2C2",
+          "row": 2,
+          "col": 2,
+          "roomId": "room-1",
+          "windows": [],
+          "object": "silla"
+        },
+        {
+          "id": "F2C3",
+          "row": 2,
+          "col": 3,
+          "roomId": "room-2",
+          "windows": [
+            "right"
+          ]
+        }
+      ],
+      [
+        {
+          "id": "F3C0",
+          "row": 3,
+          "col": 0,
+          "roomId": "room-1",
+          "windows": [
+            "bottom",
+            "left"
+          ]
+        },
+        {
+          "id": "F3C1",
+          "row": 3,
+          "col": 1,
+          "roomId": "room-1",
+          "windows": []
+        },
+        {
+          "id": "F3C2",
+          "row": 3,
+          "col": 2,
+          "roomId": "room-1",
+          "windows": [],
+          "object": "cama"
+        },
+        {
+          "id": "F3C3",
+          "row": 3,
+          "col": 3,
+          "roomId": "room-1",
+          "windows": []
+        }
+      ]
+    ],
+    "rooms": [
+      {
+        "id": "room-0",
+        "name": "Dormitorio",
+        "cells": [
+          "F0C0",
+          "F0C1",
+          "F0C2",
+          "F1C0",
+          "F1C1"
+        ]
+      },
+      {
+        "id": "room-1",
+        "name": "Cocina",
+        "cells": [
+          "F2C2",
+          "F3C0",
+          "F3C1",
+          "F3C2",
+          "F3C3"
+        ]
+      },
+      {
+        "id": "room-2",
+        "name": "Sala",
+        "cells": [
+          "F0C3",
+          "F1C2",
+          "F1C3",
+          "F2C3"
+        ]
+      },
+      {
+        "id": "room-3",
+        "name": "Baño",
+        "cells": [
+          "F2C0",
+          "F2C1"
+        ]
+      }
+    ]
+  },
+  "characters": [
+    {
+      "id": "char-0",
+      "name": "Tomás"
+    },
+    {
+      "id": "char-1",
+      "name": "Isabella"
+    },
+    {
+      "id": "char-2",
+      "name": "Valentina"
+    }
+  ],
+  "clues": [
+    {
+      "id": "clue-0",
+      "type": "in_room",
+      "subject": "char-1",
+      "params": {
+        "roomId": "room-3"
+      }
+    },
+    {
+      "id": "clue-30",
+      "type": "on_object",
+      "subject": "char-2",
+      "params": {
+        "objectType": "silla"
+      }
+    },
+    {
+      "id": "clue-35",
+      "type": "not_in_corner",
+      "subject": "char-0",
+      "params": {}
+    },
+    {
+      "id": "clue-59",
+      "type": "on_object",
+      "subject": "char-1",
+      "params": {
+        "objectType": "cama"
+      }
+    },
+    {
+      "id": "clue-68",
+      "type": "in_room",
+      "subject": "char-0",
+      "params": {
+        "roomId": "room-0"
+      }
+    }
+  ],
+  "solution": {
+    "placement": {
+      "char-0": "F0C2",
+      "char-1": "F2C1",
+      "char-2": "F1C3"
+    },
+    "culpritId": "char-0",
+    "stolenObjectCellId": "F0C0"
+  }
+}
