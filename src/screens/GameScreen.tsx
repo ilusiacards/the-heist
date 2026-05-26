@@ -21,7 +21,7 @@ type GameState =
 
 // T6: Level loader fetches pre-built JSON
 async function loadPuzzle(level: number): Promise<Puzzle> {
-  const res = await fetch(`/puzzles/level-${level}.json`)
+  const res = await fetch(`${import.meta.env.BASE_URL}puzzles/level-${level}.json`)
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const data: unknown = await res.json()
   return data as Puzzle
