@@ -24,8 +24,7 @@ export function LevelSelect({ onSelectLevel }: Props) {
         {Array.from({ length: TOTAL_LEVELS }, (_, i) => {
           const level = i + 1
           const isCompleted = progress.completedLevels.includes(level)
-          const isUnlocked = level <= progress.maxLevelReached
-          const isLocked = !isUnlocked
+          const isLocked = false
           const difficulty = DIFFICULTY_LABELS[i] ?? 'Fácil'
 
           return (
@@ -39,8 +38,7 @@ export function LevelSelect({ onSelectLevel }: Props) {
               <span className={styles.levelNum}>{level}</span>
               <span className={styles.difficulty}>{difficulty}</span>
               {isCompleted && <span className={styles.check} aria-hidden="true">✓</span>}
-              {isLocked && <span className={styles.lock} aria-hidden="true">🔒</span>}
-            </button>
+                </button>
           )
         })}
       </div>
