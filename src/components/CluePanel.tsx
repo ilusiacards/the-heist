@@ -1,6 +1,6 @@
 import type { Board, Character, Clue, CellId } from '../types'
 import { evaluateClue } from '../logic/evaluateClue'
-import { clueText } from '../logic/clueText'
+import { characterClueText } from '../logic/clueText'
 import { getCharacterColor } from '../logic/colors'
 import styles from './CluePanel.module.css'
 
@@ -11,37 +11,43 @@ interface Props {
   placement: Partial<Record<string, CellId>>
 }
 
+function getCharacterStatusClass(charId: string, clues: Clue[], placement: Partial<Record<string, CellId>>, board: Board): string {
+  const charClues = clues.filter(c => c.subject === charId)
+  if (charClues.length === 0) return styles.unknown!
+  const results = charClues.map(c => evaluateClue(c, placement, board, 'partial'))
+  if (results.some(r => r === false)) return styles.violated!
+  if (results.every(r => r === true)) return styles.satisfied!
+  return styles.unknown!
+}
+
+function getCharacterStatusIcon(charId: string, clues: Clue[], placement: Partial<Record<string, CellId>>, board: Board): string {
+  const charClues = clues.filter(c => c.subject === charId)
+  if (charClues.length === 0) return '?'
+  const results = charClues.map(c => evaluateClue(c, placement, board, 'partial'))
+  if (results.some(r => r === false)) return '✗'
+  if (results.every(r => r === true)) return '✓'
+  return '?'
+}
+
 export function CluePanel({ clues, board, characters, placement }: Props) {
-  function statusClass(clue: Clue): string {
-    const result = evaluateClue(clue, placement, board, 'partial')
-    if (result === true) return styles.satisfied!
-    if (result === false) return styles.violated!
-    return styles.unknown!
-  }
-
-  function statusIcon(clue: Clue): string {
-    const result = evaluateClue(clue, placement, board, 'partial')
-    if (result === true) return '✓'
-    if (result === false) return '✗'
-    return '?'
-  }
-
   return (
     <div className={styles.panel}>
       <h2 className={styles.title}>Pistas</h2>
       <ul className={styles.list}>
-        {clues.map(clue => {
-          const subjectColor = getCharacterColor(clue.subject, characters)
-          const text = clueText(clue, characters, board)
+        {characters.map(char => {
+          const statusClass = getCharacterStatusClass(char.id, clues, placement, board)
+          const icon = getCharacterStatusIcon(char.id, clues, placement, board)
+          const text = characterClueText(char.id, clues, characters, board)
+          const color = getCharacterColor(char.id, characters)
           return (
-            <li key={clue.id} className={`${styles.clue} ${statusClass(clue)}`}>
+            <li key={char.id} className={`${styles.clue} ${statusClass}`}>
               <span
                 className={styles.dot}
-                style={{ background: subjectColor }}
+                style={{ background: color }}
                 aria-hidden="true"
               />
               <span className={styles.text}>{text}</span>
-              <span className={styles.statusIcon} aria-hidden="true">{statusIcon(clue)}</span>
+              <span className={styles.statusIcon} aria-hidden="true">{icon}</span>
             </li>
           )
         })}

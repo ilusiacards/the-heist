@@ -12,10 +12,10 @@ import { createPRNG, seededChoice, seededInt, seededShuffle } from './prng'
 import { evaluateClue } from './evaluateClue'
 import { findAllSolutions } from './solver'
 
-// Character names pool
 const CHARACTER_NAMES = [
-  'Lucía', 'Marcos', 'Elena', 'Diego', 'Sofía',
-  'Andrés', 'Valentina', 'Pablo', 'Isabella', 'Tomás',
+  'Ana', 'Bruno', 'Celia', 'Diego', 'Elena',
+  'Felipe', 'Gara', 'Hana', 'Iván', 'Julia',
+  'Karel', 'Lola', 'Marco', 'Nadia',
 ]
 
 const ROOM_NAMES = [
@@ -35,12 +35,15 @@ type BoardConfig = {
   numRooms: number
 }
 
-function difficultyConfig(difficulty: 'easy' | 'medium' | 'hard', rng: () => number): BoardConfig {
-  switch (difficulty) {
-    case 'easy': return { rows: 4, cols: 4, numChars: 3, numRooms: seededInt(3, 4, rng) }
-    case 'medium': return { rows: 5, cols: 5, numChars: 4, numRooms: seededInt(4, 5, rng) }
-    case 'hard': return { rows: 6, cols: 6, numChars: 5, numRooms: seededInt(5, 6, rng) }
+function getDifficultyConfig(level: number, rng: () => number): BoardConfig {
+  if (level <= 10) {
+    return { rows: 5, cols: 5, numChars: 4, numRooms: seededInt(3, 4, rng) }
   }
+  if (level <= 15) {
+    return { rows: 6, cols: 6, numChars: 6, numRooms: seededInt(4, 5, rng) }
+  }
+  // levels 16–30: 7×7 board, 7 chars (hard levels differ in seed/layout, not size)
+  return { rows: 7, cols: 7, numChars: 7, numRooms: seededInt(4, 5, rng) }
 }
 
 function makeCellId(row: number, col: number): CellId {
@@ -65,7 +68,7 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
     roomGrid[pos.row]![pos.col] = r
   }
 
-  // Flood-fill from seeds using BFS, enforcing min 2 cells per room
+  // Flood-fill from seeds using BFS
   const queue: Array<{ row: number; col: number; roomId: number }> = [...seeds]
   const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
@@ -76,7 +79,6 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
       const nc = item.col + dc!
       if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue
       if (roomGrid[nr]![nc] !== -1) continue
-      // Assign to same room as parent
       roomGrid[nr]![nc] = item.roomId
       queue.push({ row: nr, col: nc, roomId: item.roomId })
     }
@@ -91,7 +93,6 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
   }
   for (let i = 0; i < numRooms; i++) {
     if (roomCounts[i]! < 2) {
-      // Retry by calling generateBoard again — caller handles retries
       throw new Error(`Room ${i} has < 2 cells`)
     }
   }
@@ -109,7 +110,6 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
       const roomIdx = roomGrid[row]![col]!
       const roomId = `room-${roomIdx}`
 
-      // Assign object with some probability
       const obj = rng() < 0.4 ? seededChoice(OBJECT_TYPES, rng) : undefined
 
       // Border cells get windows with 20% chance
@@ -133,6 +133,23 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
       return cell
     })
   )
+
+  // Ensure every row and column has at least one occupiable cell
+  // This is critical for large boards where character placement requires unique rows+cols
+  for (let r = 0; r < rows; r++) {
+    if (!cells[r]!.some(c => isOccupiable(c))) {
+      const col = Math.floor(rng() * cols)
+      const occupiableObjs = OCCUPIABLE_OBJECTS
+      cells[r]![col]!.object = occupiableObjs[Math.floor(rng() * occupiableObjs.length)]
+    }
+  }
+  for (let c = 0; c < cols; c++) {
+    if (!cells.some(row => isOccupiable(row[c]!))) {
+      const row = Math.floor(rng() * rows)
+      const occupiableObjs = OCCUPIABLE_OBJECTS
+      cells[row]![c]!.object = occupiableObjs[Math.floor(rng() * occupiableObjs.length)]
+    }
+  }
 
   // Populate room.cells
   for (let row = 0; row < rows; row++) {
@@ -261,18 +278,13 @@ function synthesizeClues(
     return count
   }
 
-  // Counterexample-guided synthesis
   const currentPlacement = { ...solution }
 
   for (let round = 0; round < 20; round++) {
-    // Check uniqueness
     const solutions = findAllSolutions(board, characters, clues, 2)
     if (solutions.length === 1) break
 
-    if (solutions.length === 0) {
-      // Clues are overconstrained — this shouldn't happen but bail
-      break
-    }
+    if (solutions.length === 0) break
 
     const altSolution = solutions.find(s => {
       return characters.some(c => s[c.id] !== solution[c.id])
@@ -302,7 +314,6 @@ function synthesizeClues(
     if (bestClue) {
       clues.push(bestClue)
     } else {
-      // No discriminating clue found — add a generic one for the most-ambiguous char
       const shuffledChars = seededShuffle(characters, rng)
       for (const char of shuffledChars) {
         const candidates = candidateClues(char.id)
@@ -320,14 +331,15 @@ function synthesizeClues(
 }
 
 export function generatePuzzle(
-  level: number,
-  difficulty: 'easy' | 'medium' | 'hard'
+  seed: number,
+  level: number
 ): Puzzle | null {
-  const rng = createPRNG(level * 1000 + (['easy', 'medium', 'hard'].indexOf(difficulty) + 1))
+  const rng = createPRNG(seed)
+  const difficulty: 'easy' | 'medium' | 'hard' =
+    level <= 10 ? 'easy' : level <= 20 ? 'medium' : 'hard'
 
-  // Step 1: Generate board (max 3 attempts)
   for (let boardAttempt = 0; boardAttempt < 3; boardAttempt++) {
-    const config = difficultyConfig(difficulty, rng)
+    const config = getDifficultyConfig(level, rng)
 
     let board: Board | null = null
     for (let boardRetry = 0; boardRetry < 5; boardRetry++) {
@@ -350,14 +362,12 @@ export function generatePuzzle(
     const reservedCell = board.cells.flat().find(c => c.id === reservedCellId)!
     const reservedRoomId = reservedCell.roomId
 
-    // Step 4: Place characters (max 5 attempts)
+    // Step 4: Place characters
     const charNames = seededShuffle(CHARACTER_NAMES, rng).slice(0, config.numChars)
     const characters: Character[] = charNames.map((name, i) => ({ id: `char-${i}`, name }))
-    // Culprit is char-0, placed in reserved room
     const culprit = characters[0]!
 
     for (let placeAttempt = 0; placeAttempt < 5; placeAttempt++) {
-      // Find cells in reserved room (excluding reserved cell itself)
       const reservedRoomCells = occupiable.filter(cid => {
         const c = board!.cells.flat().find(cell => cell.id === cid)
         return c?.roomId === reservedRoomId && cid !== reservedCellId
@@ -366,7 +376,6 @@ export function generatePuzzle(
 
       const culpritCellId = seededChoice(reservedRoomCells, rng)
 
-      // Place remaining chars outside reserved room
       const outsideCells = seededShuffle(
         occupiable.filter(cid => {
           const c = board!.cells.flat().find(cell => cell.id === cid)
@@ -377,7 +386,6 @@ export function generatePuzzle(
 
       if (outsideCells.length < config.numChars - 1) continue
 
-      // Assign positions: unique row+col
       const solution: Record<string, CellId> = { [culprit.id]: culpritCellId }
       const usedRows = new Set([parseInt(culpritCellId.match(/F(\d+)/)![1]!)])
       const usedCols = new Set([parseInt(culpritCellId.match(/C(\d+)/)![1]!)])
@@ -400,10 +408,8 @@ export function generatePuzzle(
       }
       if (!valid) continue
 
-      // Step 5: Synthesize clues
       const clues = synthesizeClues(board, characters, solution, culprit.id, rng)
 
-      // Validate uniqueness
       const solutions = findAllSolutions(board, characters, clues, 2)
       if (solutions.length !== 1) continue
 

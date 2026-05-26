@@ -1,32 +1,30 @@
 #!/usr/bin/env bun
+// Generates levels 23-30 (hard: 8x8 to 10x10)
 import { writeFileSync, mkdirSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { generatePuzzle } from '../src/logic/generator'
 
-const TOTAL_LEVELS = 30
-const MAX_ATTEMPTS = 100
+const START_LEVEL = 23
+const END_LEVEL = 30
+const MAX_ATTEMPTS = 200
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUTPUT_DIR = join(__dirname, '..', 'public', 'puzzles')
 
 mkdirSync(OUTPUT_DIR, { recursive: true })
 
-let failures = 0
-
-for (let level = 1; level <= TOTAL_LEVELS; level++) {
+for (let level = START_LEVEL; level <= END_LEVEL; level++) {
+  const t0 = Date.now()
   let generated = false
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const seed = level * 1000 + attempt
     const puzzle = generatePuzzle(seed, level)
-    if (!puzzle) {
-      failures++
-      continue
-    }
+    if (!puzzle) continue
     const patchedPuzzle = { ...puzzle, level }
     const filePath = join(OUTPUT_DIR, `level-${level}.json`)
     writeFileSync(filePath, JSON.stringify(patchedPuzzle, null, 2))
-    const difficulty = level <= 10 ? 'easy' : level <= 20 ? 'medium' : 'hard'
-    console.log(`[generate] Level ${level} (${difficulty}, seed=${seed}) → ${filePath}`)
+    const ms = Date.now() - t0
+    console.log(`[generate] Level ${level} (hard, seed=${seed}, attempt=${attempt}) → ${filePath} [${ms}ms]`)
     generated = true
     break
   }
@@ -36,8 +34,4 @@ for (let level = 1; level <= TOTAL_LEVELS; level++) {
   }
 }
 
-if (failures > 0) {
-  console.warn(`[generate] ${failures} seeds failed and were skipped`)
-}
-
-console.log(`[generate] Done — ${TOTAL_LEVELS} puzzles written to ${OUTPUT_DIR}`)
+console.log(`[generate] Done — levels ${START_LEVEL}-${END_LEVEL} written`)
