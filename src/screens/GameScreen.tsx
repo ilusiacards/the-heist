@@ -27,15 +27,32 @@ async function loadPuzzle(level: number): Promise<Puzzle> {
   return data as Puzzle
 }
 
-function countFreeOccupiable(puzzle: Puzzle, placement: Partial<Record<string, CellId>>): number {
+// Counts occupiable cells that are not occupied, not in an eliminated row, and not in an
+// eliminated col. The solver places characters in unique rows+cols, so the correct full
+// placement always leaves exactly 1 such cell — the accusation target.
+function countValidFreeCells(
+  puzzle: Puzzle,
+  placement: Partial<Record<string, CellId>>,
+  eliminatedRows: Set<number>,
+  eliminatedCols: Set<number>
+): { count: number; cellId: CellId | null } {
   const occupiedCells = new Set(Object.values(placement).filter(Boolean) as CellId[])
   let count = 0
+  let cellId: CellId | null = null
   for (const row of puzzle.board.cells) {
     for (const cell of row) {
-      if (isOccupiable(cell) && !occupiedCells.has(cell.id)) count++
+      if (
+        isOccupiable(cell) &&
+        !occupiedCells.has(cell.id) &&
+        !eliminatedRows.has(cell.row) &&
+        !eliminatedCols.has(cell.col)
+      ) {
+        count++
+        cellId = cell.id
+      }
     }
   }
-  return count
+  return { count, cellId }
 }
 
 export function GameScreen({ level, onWin, onBack }: Props) {
@@ -83,21 +100,12 @@ export function GameScreen({ level, onWin, onBack }: Props) {
 
   let glowingCellId: CellId | null = null
   if (allPlaced && puzzle) {
-    const freeCount = countFreeOccupiable(puzzle, placement)
-    if (freeCount === 1) {
-      for (const row of puzzle.board.cells) {
-        for (const cell of row) {
-          if (isOccupiable(cell) && !Object.values(placement).includes(cell.id)) {
-            glowingCellId = cell.id
-            break
-          }
-        }
-        if (glowingCellId) break
-      }
+    const { count, cellId } = countValidFreeCells(puzzle, placement, eliminatedRows, eliminatedCols)
+    if (count === 1) {
+      glowingCellId = cellId
     }
-    // Dev assertion
-    if (import.meta.env.DEV && freeCount !== 1) {
-      console.error(`[GameScreen] Expected 1 free occupiable cell, got ${freeCount}`)
+    if (import.meta.env.DEV && count !== 1) {
+      console.error(`[GameScreen] Expected 1 valid free cell, got ${count}`)
     }
   }
 
