@@ -55,6 +55,27 @@ describe('generator — generatePuzzle', () => {
     expect(occupiable).toBeGreaterThanOrEqual(puzzle.characters.length + 1)
   })
 
+  it('stolenObjectCellId is at the intersection of the one free row and free col', () => {
+    // After placing all N chars (each in unique row+col on an (N+1)x(N+1) board),
+    // exactly 1 row and 1 col remain unoccupied. The stolen-object cell must be that
+    // intersection — otherwise countValidFreeCells() returns 0 and the game is unwinnable.
+    for (const level of [1, 5, 11, 16, 20]) {
+      const puzzle = generateLevel(level)
+      expect(puzzle).not.toBeNull()
+      if (!puzzle) continue
+      const usedRows = new Set<number>()
+      const usedCols = new Set<number>()
+      for (const cellId of Object.values(puzzle.solution.placement)) {
+        const cell = puzzle.board.cells.flat().find(c => c.id === cellId)!
+        usedRows.add(cell.row)
+        usedCols.add(cell.col)
+      }
+      const stolenCell = puzzle.board.cells.flat().find(c => c.id === puzzle.solution.stolenObjectCellId)!
+      expect(usedRows.has(stolenCell.row)).toBe(false)
+      expect(usedCols.has(stolenCell.col)).toBe(false)
+    }
+  })
+
   it('fuzz: levels 1-20 each produce a puzzle with exactly 1 solution', () => {
     for (let level = 1; level <= 20; level++) {
       const puzzle = generateLevel(level)
