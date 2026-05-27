@@ -93,7 +93,7 @@ function subordinateClauseText(clue: Clue, characters: Character[], board: Board
     case 'same_room_as':
       return `junto a ${charName(clue.params.otherId, characters)}`
     case 'not_same_room_as':
-      return `lejos de ${charName(clue.params.otherId, characters)}`
+      return `en otra habitación que ${charName(clue.params.otherId, characters)}`
     case 'in_corner':
       return `en una esquina`
     case 'not_in_corner':
@@ -115,7 +115,7 @@ function subordinateClauseText(clue: Clue, characters: Character[], board: Board
     case 'next_to_window':
       return `junto a una ventana`
     case 'not_next_to_window':
-      return `lejos de las ventanas`
+      return `sin ventanas cercanas`
     case 'n_cols_direction_of':
       return `${clue.params.n} col${clue.params.n !== 1 ? 's' : ''} ${DIRECTION_ES[clue.params.direction] ?? clue.params.direction} de ${charName(clue.params.otherId, characters)}`
     case 'n_rows_direction_of':

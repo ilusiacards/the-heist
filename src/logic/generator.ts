@@ -173,13 +173,19 @@ function getOccupiableCells(board: Board): CellId[] {
   return result
 }
 
+// Unary clue types constrain only the subject character and enable solver pre-filtering.
+// Preferring them in synthesis reduces the solver's search space significantly.
+const UNARY_CLUE_TYPES = new Set<Clue['type']>([
+  'in_room', 'on_object', 'in_corner', 'not_in_corner', 'next_to_window', 'not_next_to_window',
+])
+
 function synthesizeClues(
   board: Board,
   characters: Character[],
   solution: Record<string, CellId>,
   _culpritId: string,
   rng: () => number
-): Clue[] {
+): { clues: Clue[]; unique: boolean } {
   const clues: Clue[] = []
   let clueIdCounter = 0
 
@@ -267,7 +273,7 @@ function synthesizeClues(
     return candidates
   }
 
-  // Compute restrictiveness: how many chars are eliminated by this clue
+  // Compute restrictiveness: how many cells does this clue eliminate for the subject
   function restrictiveness(clue: Clue): number {
     let count = 0
     for (const cell of board.cells.flat()) {
@@ -280,27 +286,37 @@ function synthesizeClues(
 
   const currentPlacement = { ...solution }
 
+  // Lazy alt-solution: reuse the known alternative across rounds instead of re-proving
+  // uniqueness every round (which requires exhaustive search once clues are near-unique).
+  // Only call findAllSolutions when the known alt is ruled out by the latest clue.
+  let altSolution: Record<string, CellId> | null = null
+  let unique = false
+
   for (let round = 0; round < 20; round++) {
-    const solutions = findAllSolutions(board, characters, clues, 2)
-    if (solutions.length === 1) break
+    // Check if we need a fresh alternative solution
+    let needNewAlt = altSolution === null
+    if (altSolution) {
+      const altStillValid = clues.every(clue => evaluateClue(clue, altSolution!, board, 'full') !== false)
+      if (!altStillValid) needNewAlt = true
+    }
 
-    if (solutions.length === 0) break
+    if (needNewAlt) {
+      const solutions = findAllSolutions(board, characters, clues, 2)
+      if (solutions.length === 1) { unique = true; break }
+      if (solutions.length === 0) break
+      altSolution = solutions.find(s => characters.some(c => s[c.id] !== solution[c.id])) ?? null
+      if (!altSolution) break
+    }
 
-    const altSolution = solutions.find(s => {
-      return characters.some(c => s[c.id] !== solution[c.id])
-    })
-
-    if (!altSolution) break
-
-    // Find a clue that is true for canonical and false for alt
+    // Find best discriminating clue. Prefer unary clues first since they let the
+    // solver pre-filter candidates, making subsequent uniqueness checks much faster.
     let bestClue: Clue | null = null
     let bestScore = -1
 
-    for (const char of seededShuffle(characters, rng)) {
-      const candidates = candidateClues(char.id)
-      for (const candidate of seededShuffle(candidates, rng)) {
+    function scoreCandidates(candidateList: Clue[]) {
+      for (const candidate of candidateList) {
         const canonicalResult = evaluateClue(candidate, currentPlacement, board, 'full')
-        const altResult = evaluateClue(candidate, altSolution, board, 'full')
+        const altResult = evaluateClue(candidate, altSolution!, board, 'full')
         if (canonicalResult === true && altResult === false) {
           const score = restrictiveness(candidate)
           if (score > bestScore) {
@@ -308,6 +324,17 @@ function synthesizeClues(
             bestClue = candidate
           }
         }
+      }
+    }
+
+    // First pass: unary clues only
+    for (const char of seededShuffle(characters, rng)) {
+      scoreCandidates(candidateClues(char.id).filter(c => UNARY_CLUE_TYPES.has(c.type)))
+    }
+    // Second pass: relational clues if no unary discriminated
+    if (!bestClue) {
+      for (const char of seededShuffle(characters, rng)) {
+        scoreCandidates(candidateClues(char.id).filter(c => !UNARY_CLUE_TYPES.has(c.type)))
       }
     }
 
@@ -327,7 +354,21 @@ function synthesizeClues(
     }
   }
 
-  return clues
+  // Every character must have at least one visible clue. If synthesis left any
+  // character without a clue (their position was implied by others), add the
+  // most informative clue for them so players always see something.
+  for (const char of characters) {
+    if (!clues.some(c => c.subject === char.id)) {
+      const candidates = candidateClues(char.id)
+      if (candidates.length > 0) {
+        const scored = candidates.map(c => ({ clue: c, score: restrictiveness(c) }))
+        scored.sort((a, b) => b.score - a.score)
+        clues.push(scored[0]!.clue)
+      }
+    }
+  }
+
+  return { clues, unique }
 }
 
 export function generatePuzzle(
@@ -408,10 +449,10 @@ export function generatePuzzle(
       }
       if (!valid) continue
 
-      const clues = synthesizeClues(board, characters, solution, culprit.id, rng)
+      const { clues, unique } = synthesizeClues(board, characters, solution, culprit.id, rng)
 
-      const solutions = findAllSolutions(board, characters, clues, 2)
-      if (solutions.length !== 1) continue
+      // Synthesis already proved uniqueness via findAllSolutions; skip redundant check.
+      if (!unique) continue
 
       return {
         id: `level-${level}`,
