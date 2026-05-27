@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.4.0] - 2026-05-27
+
+### Added
+
+- **Solutions Inspector (developer tool)**: New screen accessible from the level selector via "Ver soluciones" button. Shows all 30 puzzle solutions with every suspect placed, the stolen-object cell glowing green, and all clues highlighted as satisfied. Lets developers validate puzzle JSON visually in 2 clicks instead of reading raw files. Includes loading/error states, read-only board (pointer events disabled), and navigation between levels.
+
+### Changed
+
+- **`computeEliminatedSets` extracted to `src/logic/boardUtils.ts`**: Shared utility for computing eliminated rows/cols from a placement. GameScreen and SolutionDetailScreen both use it — removes code duplication.
+- **`BoardGrid` gains `readOnly` prop**: When true, applies `pointerEvents: none` to the grid, suppressing hover, cursor, and the glowing-cell pulse animation. Used by SolutionDetailScreen.
+- **`App.tsx` WinScreen guard**: Fixed implicit fallthrough to `WinScreen` that would crash at runtime (`view.puzzle` undefined) if new view states were added. Now uses explicit `if (view.screen === 'win')` + `return null`.
+
 ## [0.1.3.0] - 2026-05-27
 
 ### Fixed
