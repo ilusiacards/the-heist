@@ -32,11 +32,11 @@ export function HelpOverlay({ onClose }: Props) {
           </p>
           <p className={styles.rule}>
             <span className={styles.icon}>💡</span>
-            Usá las pistas para deducir la posición exacta de cada uno.
+            Usa las pistas para deducir la posición exacta de cada uno.
           </p>
           <p className={styles.rule}>
             <span className={styles.icon}>👆</span>
-            Tocá una celda para colocar o mover un personaje.
+            Toca una celda para colocar o mover un personaje.
           </p>
           <p className={styles.rule}>
             <span className={styles.icon}>✕</span>
@@ -44,7 +44,7 @@ export function HelpOverlay({ onClose }: Props) {
           </p>
           <p className={styles.rule}>
             <span className={styles.icon}>🟢</span>
-            Cuando todos estén colocados, brillará la celda del objeto robado — hacé clic para acusar al ladrón.
+            Cuando todos estén colocados, brillará la celda del objeto robado — haz clic para acusar al ladrón.
           </p>
           <p className={styles.rule}>
             <span className={styles.icon}>🔒</span>

@@ -30,7 +30,7 @@ export function SolutionDetailScreen({ level, onBack }: Props) {
       .then(puzzle => setState({ status: 'ready', puzzle }))
       .catch(() => setState({
         status: 'error',
-        message: `No se pudo cargar el nivel ${level}. Verificá tu conexión.`,
+        message: `No se pudo cargar el nivel ${level}. Verifica tu conexión.`,
       }))
   }, [level])
 
@@ -64,7 +64,7 @@ export function SolutionDetailScreen({ level, onBack }: Props) {
             setState({ status: 'loading' })
             loadPuzzle(level)
               .then(puzzle => setState({ status: 'ready', puzzle }))
-              .catch(() => setState({ status: 'error', message: `No se pudo cargar el nivel ${level}. Verificá tu conexión.` }))
+              .catch(() => setState({ status: 'error', message: `No se pudo cargar el nivel ${level}. Verifica tu conexión.` }))
           }}>
             Reintentar
           </button>
