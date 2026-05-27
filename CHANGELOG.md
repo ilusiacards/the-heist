@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3.0] - 2026-05-27
+
+### Fixed
+
+- **All 30 levels are now forward-solvable via pure logical deduction**: Previously, 15 of 30 levels could not be uniquely solved by applying clues step-by-step (forward constraint propagation) — they required guessing or backtracking. Root cause: the clue synthesis was guided by "discriminating between two alternatives" rather than "building a step-by-step deduction chain." New approach: synthesis uses an internal forward-solver (`forwardSolveState`) and in each round selects the clue that most reduces candidates for an unplaced character, preferring clues that narrow a character to exactly 1 position (enabling placement and triggering chain deductions). A puzzle is only accepted when the forward solver places all characters at their exact intended positions AND `findAllSolutions` confirms strict uniqueness.
+- **`not_next_to_window` clue incorrectly generated**: The `candidateClues` function was generating `not_next_to_window` for any cell with `windows.length === 0`, but `evaluateClue` for this type also checks adjacent cells in the same room. This caused clues that were false for the intended solution to be added. Fix: all candidate clues are now verified with `evaluateClue` against the intended solution before use.
+- **Generator fuzz test 30× faster**: The forward-solver-guided synthesis avoids repeated backtracking searches during clue selection. The fuzz test (levels 1–20, finding solutions with `findAllSolutions`) dropped from 415 seconds to 14 seconds.
+
+### Changed
+
+- All 30 puzzle levels regenerated with the improved generator.
+
 ## [0.1.2.0] - 2026-05-27
 
 ### Fixed

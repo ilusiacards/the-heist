@@ -173,6 +173,83 @@ const UNARY_CLUE_TYPES = new Set<Clue['type']>([
   'in_room', 'on_object', 'in_corner', 'not_in_corner', 'next_to_window', 'not_next_to_window',
 ])
 
+// Run forward constraint propagation (human-style deduction) and return what gets placed.
+// Uses 'partial' evaluateClue mode so relational clues only filter when the other
+// character is already placed — exactly how a human would reason step by step.
+function forwardSolveState(
+  board: Board,
+  characters: Character[],
+  clues: Clue[]
+): { placed: Record<string, CellId>; candidates: Map<string, CellId[]> } {
+  const allCells = board.cells.flat()
+  const occupiable = allCells.filter(c => isOccupiable(c))
+  const cellById = new Map(allCells.map(c => [c.id as string, c]))
+
+  const candidates = new Map<string, Set<CellId>>()
+  for (const char of characters) {
+    candidates.set(char.id, new Set(occupiable.map(c => c.id as CellId)))
+  }
+
+  const placed: Record<string, CellId> = {}
+  const usedRows = new Set<number>()
+  const usedCols = new Set<number>()
+
+  function propagateRowCol() {
+    let changed = false
+    for (const [charId, cands] of candidates) {
+      if (placed[charId]) continue
+      for (const cellId of [...cands]) {
+        const cell = cellById.get(cellId)!
+        if (usedRows.has(cell.row) || usedCols.has(cell.col)) {
+          cands.delete(cellId)
+          changed = true
+        }
+      }
+    }
+    return changed
+  }
+
+  let changed = true
+  while (changed) {
+    changed = false
+
+    for (const clue of clues) {
+      const subject = clue.subject
+      if (placed[subject]) continue
+      const cands = candidates.get(subject)!
+
+      for (const cellId of [...cands]) {
+        const testPlacement: Record<string, CellId> = { ...placed, [subject]: cellId }
+        const result = evaluateClue(clue, testPlacement, board, 'partial')
+        if (result === false) {
+          cands.delete(cellId)
+          changed = true
+        }
+      }
+    }
+
+    for (const char of characters) {
+      if (placed[char.id]) continue
+      const cands = candidates.get(char.id)!
+      if (cands.size === 1) {
+        const cellId = [...cands][0]! as CellId
+        placed[char.id] = cellId
+        const cell = cellById.get(cellId)!
+        usedRows.add(cell.row)
+        usedCols.add(cell.col)
+        changed = true
+      }
+    }
+
+    if (propagateRowCol()) changed = true
+  }
+
+  return {
+    placed,
+    candidates: new Map([...candidates].map(([k, v]) => [k, [...v]])),
+  }
+}
+
 function synthesizeClues(
   board: Board,
   characters: Character[],
@@ -196,75 +273,65 @@ function synthesizeClues(
     throw new Error(`Cell not found: ${cellId}`)
   }
 
+  // All candidate clues for charId — every entry is guaranteed TRUE for the intended solution.
   function candidateClues(charId: string): Clue[] {
     const cellId = solution[charId]!
     const cell = getCell(cellId)
-    const candidates: Clue[] = []
+    const raw: Clue[] = []
 
-    // in_room
-    candidates.push({ id: makeId(), type: 'in_room', subject: charId, params: { roomId: cell.roomId } })
+    raw.push({ id: makeId(), type: 'in_room', subject: charId, params: { roomId: cell.roomId } })
 
-    // in_corner / not_in_corner
     const isCornerCell = (cell.row === 0 || cell.row === board.rows - 1) &&
       (cell.col === 0 || cell.col === board.cols - 1)
-    if (isCornerCell) {
-      candidates.push({ id: makeId(), type: 'in_corner', subject: charId, params: {} })
-    } else {
-      candidates.push({ id: makeId(), type: 'not_in_corner', subject: charId, params: {} })
-    }
+    raw.push({ id: makeId(), type: isCornerCell ? 'in_corner' : 'not_in_corner', subject: charId, params: {} })
 
-    // on_object / not_on_object
     if (cell.object && OCCUPIABLE_OBJECTS.includes(cell.object as typeof OCCUPIABLE_OBJECTS[number])) {
-      candidates.push({ id: makeId(), type: 'on_object', subject: charId, params: { objectType: cell.object } })
+      raw.push({ id: makeId(), type: 'on_object', subject: charId, params: { objectType: cell.object } })
     }
 
-    // next_to_window
-    if (cell.windows.length > 0) {
-      candidates.push({ id: makeId(), type: 'next_to_window', subject: charId, params: {} })
+    // next_to_window / not_next_to_window: use evaluateClue so the neighbour-scan
+    // logic matches the runtime evaluator exactly (cell.windows alone is insufficient).
+    const ntwTest: Clue = { id: makeId(), type: 'next_to_window', subject: charId, params: {} }
+    if (evaluateClue(ntwTest, solution, board, 'full') === true) {
+      raw.push(ntwTest)
     } else {
-      candidates.push({ id: makeId(), type: 'not_next_to_window', subject: charId, params: {} })
+      raw.push({ id: makeId(), type: 'not_next_to_window', subject: charId, params: {} })
     }
 
-    // Relational clues with other chars
     for (const other of characters) {
       if (other.id === charId) continue
       const otherCellId = solution[other.id]!
       const otherCell = getCell(otherCellId)
 
-      // same_room_as / not_same_room_as
-      if (cell.roomId === otherCell.roomId) {
-        candidates.push({ id: makeId(), type: 'same_room_as', subject: charId, params: { otherId: other.id } })
-      } else {
-        candidates.push({ id: makeId(), type: 'not_same_room_as', subject: charId, params: { otherId: other.id } })
-      }
+      raw.push({
+        id: makeId(),
+        type: cell.roomId === otherCell.roomId ? 'same_room_as' : 'not_same_room_as',
+        subject: charId,
+        params: { otherId: other.id },
+      })
 
-      // direction_of
       const rowDiff = cell.row - otherCell.row
       const colDiff = cell.col - otherCell.col
       if (rowDiff !== 0 && colDiff === 0) {
-        const dir = rowDiff < 0 ? 'north' : 'south'
-        candidates.push({ id: makeId(), type: 'direction_of', subject: charId, params: { otherId: other.id, direction: dir } })
+        raw.push({ id: makeId(), type: 'direction_of', subject: charId, params: { otherId: other.id, direction: rowDiff < 0 ? 'north' : 'south' } })
       } else if (colDiff !== 0 && rowDiff === 0) {
-        const dir = colDiff > 0 ? 'east' : 'west'
-        candidates.push({ id: makeId(), type: 'direction_of', subject: charId, params: { otherId: other.id, direction: dir } })
+        raw.push({ id: makeId(), type: 'direction_of', subject: charId, params: { otherId: other.id, direction: colDiff > 0 ? 'east' : 'west' } })
       }
 
-      // next_to
       if (Math.abs(rowDiff) + Math.abs(colDiff) === 1) {
-        candidates.push({ id: makeId(), type: 'next_to', subject: charId, params: { otherId: other.id } })
+        raw.push({ id: makeId(), type: 'next_to', subject: charId, params: { otherId: other.id } })
       }
 
-      // n_cols_direction_of (exact column offset)
       if (rowDiff === 0 && Math.abs(colDiff) <= 3 && colDiff !== 0) {
-        const dir = colDiff > 0 ? 'east' : 'west'
-        candidates.push({
+        raw.push({
           id: makeId(), type: 'n_cols_direction_of', subject: charId,
-          params: { otherId: other.id, direction: dir, n: Math.abs(colDiff) }
+          params: { otherId: other.id, direction: colDiff > 0 ? 'east' : 'west', n: Math.abs(colDiff) },
         })
       }
     }
 
-    return candidates
+    // Guard: only return clues that are actually TRUE for the intended solution.
+    return raw.filter(c => evaluateClue(c, solution, board, 'full') === true)
   }
 
   // Compute restrictiveness: how many cells does this clue eliminate for the subject
@@ -278,79 +345,78 @@ function synthesizeClues(
     return count
   }
 
-  const currentPlacement = { ...solution }
+  // Forward-solve-guided synthesis: each round, add the clue that best reduces
+  // candidate cells for an unplaced character, preferring clues that narrow a
+  // character to exactly 1 cell (enabling placement and triggering chain deductions).
+  for (let round = 0; round < 50; round++) {
+    const { placed, candidates } = forwardSolveState(board, characters, clues)
 
-  // Lazy alt-solution: reuse the known alternative across rounds instead of re-proving
-  // uniqueness every round (which requires exhaustive search once clues are near-unique).
-  // Only call findAllSolutions when the known alt is ruled out by the latest clue.
-  let altSolution: Record<string, CellId> | null = null
-  let unique = false
+    if (Object.keys(placed).length === characters.length) break
 
-  for (let round = 0; round < 20; round++) {
-    // Check if we need a fresh alternative solution
-    let needNewAlt = altSolution === null
-    if (altSolution) {
-      const altStillValid = clues.every(clue => evaluateClue(clue, altSolution!, board, 'full') !== false)
-      if (!altStillValid) needNewAlt = true
-    }
-
-    if (needNewAlt) {
-      const solutions = findAllSolutions(board, characters, clues, 2)
-      if (solutions.length === 1) { unique = true; break }
-      if (solutions.length === 0) break
-      altSolution = solutions.find(s => characters.some(c => s[c.id] !== solution[c.id])) ?? null
-      if (!altSolution) break
-    }
-
-    // Find best discriminating clue. Prefer unary clues first since they let the
-    // solver pre-filter candidates, making subsequent uniqueness checks much faster.
     let bestClue: Clue | null = null
-    let bestScore = -1
+    let bestRemaining = Infinity
+    let bestIsPlacing = false
+    let bestIsUnary = false
 
-    function scoreCandidates(candidateList: Clue[]) {
-      for (const candidate of candidateList) {
-        const canonicalResult = evaluateClue(candidate, currentPlacement, board, 'full')
-        const altResult = evaluateClue(candidate, altSolution!, board, 'full')
-        if (canonicalResult === true && altResult === false) {
-          const score = restrictiveness(candidate)
-          if (score > bestScore) {
-            bestScore = score
-            bestClue = candidate
-          }
+    for (const char of seededShuffle([...characters], rng)) {
+      if (placed[char.id]) continue
+      const currentCands = candidates.get(char.id) ?? []
+      if (currentCands.length <= 1) continue
+
+      const charClues = [
+        ...candidateClues(char.id).filter(c => UNARY_CLUE_TYPES.has(c.type)),
+        ...candidateClues(char.id).filter(c => !UNARY_CLUE_TYPES.has(c.type)),
+      ]
+
+      for (const clue of charClues) {
+        const isDuplicate = clues.some(c =>
+          c.subject === clue.subject &&
+          c.type === clue.type &&
+          JSON.stringify(c.params) === JSON.stringify(clue.params)
+        )
+        if (isDuplicate) continue
+
+        const remaining = currentCands.filter(cellId => {
+          const testPlacement: Record<string, CellId> = { ...placed, [clue.subject]: cellId }
+          return evaluateClue(clue, testPlacement, board, 'partial') !== false
+        })
+
+        const remainingCount = remaining.length
+        const reduction = currentCands.length - remainingCount
+        if (reduction === 0) continue
+
+        const isPlacing = remainingCount === 1
+        const isUnary = UNARY_CLUE_TYPES.has(clue.type)
+
+        const better =
+          !bestClue ||
+          (isPlacing && !bestIsPlacing) ||
+          (isPlacing === bestIsPlacing && isUnary && !bestIsUnary) ||
+          (isPlacing === bestIsPlacing && isUnary === bestIsUnary && remainingCount < bestRemaining)
+
+        if (better) {
+          bestClue = clue
+          bestRemaining = remainingCount
+          bestIsPlacing = isPlacing
+          bestIsUnary = isUnary
         }
-      }
-    }
-
-    // First pass: unary clues only
-    for (const char of seededShuffle(characters, rng)) {
-      scoreCandidates(candidateClues(char.id).filter(c => UNARY_CLUE_TYPES.has(c.type)))
-    }
-    // Second pass: relational clues if no unary discriminated
-    if (!bestClue) {
-      for (const char of seededShuffle(characters, rng)) {
-        scoreCandidates(candidateClues(char.id).filter(c => !UNARY_CLUE_TYPES.has(c.type)))
       }
     }
 
     if (bestClue) {
       clues.push(bestClue)
     } else {
-      const shuffledChars = seededShuffle(characters, rng)
-      for (const char of shuffledChars) {
-        const candidates = candidateClues(char.id)
-        const scored = candidates.map(c => ({ clue: c, score: restrictiveness(c) }))
-        scored.sort((a, b) => b.score - a.score)
-        if (scored.length > 0) {
-          clues.push(scored[0]!.clue)
-          break
-        }
-      }
+      break
     }
   }
 
-  // Every character must have at least one visible clue. If synthesis left any
-  // character without a clue (their position was implied by others), add the
-  // most informative clue for them so players always see something.
+  // Accept only if forward propagation finds the EXACT intended solution
+  // AND the puzzle is strictly unique (no other solution satisfies the clues).
+  const { placed: finalPlaced } = forwardSolveState(board, characters, clues)
+  const forwardMatchesSolution = characters.every(c => finalPlaced[c.id] === solution[c.id])
+  const unique = forwardMatchesSolution && findAllSolutions(board, characters, clues, 2).length === 1
+
+  // Every character must have at least one visible clue so players always see something.
   for (const char of characters) {
     if (!clues.some(c => c.subject === char.id)) {
       const candidates = candidateClues(char.id)

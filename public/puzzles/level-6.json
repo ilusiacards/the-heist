@@ -272,62 +272,56 @@
     {
       "id": "clue-2",
       "type": "on_object",
-      "subject": "char-1",
+      "subject": "char-0",
+      "params": {
+        "objectType": "silla"
+      }
+    },
+    {
+      "id": "clue-92",
+      "type": "in_room",
+      "subject": "char-0",
+      "params": {
+        "roomId": "room-2"
+      }
+    },
+    {
+      "id": "clue-121",
+      "type": "in_corner",
+      "subject": "char-2",
+      "params": {}
+    },
+    {
+      "id": "clue-182",
+      "type": "on_object",
+      "subject": "char-3",
       "params": {
         "objectType": "cama"
       }
     },
     {
-      "id": "clue-26",
-      "type": "in_corner",
-      "subject": "char-2",
-      "params": {}
-    },
-    {
-      "id": "clue-51",
-      "type": "in_corner",
-      "subject": "char-3",
-      "params": {}
-    },
-    {
-      "id": "clue-94",
+      "id": "clue-196",
       "type": "in_room",
-      "subject": "char-3",
-      "params": {
-        "roomId": "room-1"
-      }
-    },
-    {
-      "id": "clue-100",
-      "type": "in_room",
-      "subject": "char-0",
+      "subject": "char-1",
       "params": {
         "roomId": "room-0"
       }
     },
     {
-      "id": "clue-125",
-      "type": "in_room",
-      "subject": "char-2",
-      "params": {
-        "roomId": "room-0"
-      }
-    },
-    {
-      "id": "clue-171",
+      "id": "clue-213",
       "type": "not_next_to_window",
-      "subject": "char-0",
+      "subject": "char-1",
       "params": {}
     }
   ],
   "solution": {
     "placement": {
-      "char-0": "F2C2",
-      "char-1": "F3C1",
-      "char-2": "F4C0",
-      "char-3": "F0C4"
+      "char-0": "F4C4",
+      "char-1": "F2C2",
+      "char-2": "F0C0",
+      "char-3": "F3C1"
     },
-    "culpritId": "char-3",
+    "culpritId": "char-2",
     "stolenObjectCellId": "F1C3"
   }
 }
