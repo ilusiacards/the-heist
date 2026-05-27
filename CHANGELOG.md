@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5.0] - 2026-05-27
+
+### Changed
+
+- **Español de España**: Textos de UI migrados de español latinoamericano (voseo) a español de España (tuteo). Afecta 8 strings en `GameScreen`, `SolutionDetailScreen` y `HelpOverlay` — "Verificá" → "Verifica", "Intentá" → "Intenta", "Usá" → "Usa", "Tocá" → "Toca", "hacé clic" → "haz clic". Sin cambios de lógica.
+
 ## [0.1.4.0] - 2026-05-27
 
 ### Added

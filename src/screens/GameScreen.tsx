@@ -71,8 +71,8 @@ export function GameScreen({ level, onWin, onBack }: Props) {
       .then(puzzle => setGameState({ status: 'playing', puzzle }))
       .catch(err => {
         const msg = err instanceof SyntaxError
-          ? 'El archivo del puzzle está corrupto. Intentá recargar la página.'
-          : `No se pudo cargar el nivel ${level}. Verificá tu conexión.`
+          ? 'El archivo del puzzle está corrupto. Intenta recargar la página.'
+          : `No se pudo cargar el nivel ${level}. Verifica tu conexión.`
         setGameState({ status: 'error', message: msg })
       })
   }, [level])
@@ -194,7 +194,7 @@ export function GameScreen({ level, onWin, onBack }: Props) {
 
       {allPlaced && glowingCellId && !wrongAccusation && (
         <div className={styles.accusePrompt} role="status">
-          Una celda brilla en verde — hacé clic para acusar
+          Una celda brilla en verde — haz clic para acusar
         </div>
       )}
 
