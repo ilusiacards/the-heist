@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2.0] - 2026-05-27
+
+### Fixed
+
+- **Puzzles were unwinnable on all levels**: The game requires that after placing all suspects, exactly one cell remains as the "glowing" accusation target (the stolen object location). Two bugs caused this to never work: (1) boards were N×N with N characters — after placing N characters in unique rows+columns, all rows and all columns are occupied, leaving zero valid free cells; (2) `stolenObjectCellId` was picked at random and didn't land on the required intersection. Fix: boards are now (N+1)×(N+1) (5×5/4 chars, 6×6/5 chars, 7×7/6 chars), and the stolen-object cell is always the intersection of the single free row × free column, with exactly one suspect (the culprit) sharing that room. All 30 levels regenerated.
+
 ## [0.1.1.0] - 2026-05-27
 
 ### Fixed

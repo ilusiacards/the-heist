@@ -36,14 +36,18 @@ type BoardConfig = {
 }
 
 function getDifficultyConfig(level: number, rng: () => number): BoardConfig {
+  // Invariant: rows === cols === numChars + 1.
+  // The solver places each character in a unique row AND column. After N characters
+  // are placed on an (N+1)×(N+1) board, exactly one row and one column remain free.
+  // The stolen-object cell is the intersection of that free row × free col, which is
+  // the single valid empty cell the player sees glowing at the end of the puzzle.
   if (level <= 10) {
     return { rows: 5, cols: 5, numChars: 4, numRooms: seededInt(3, 4, rng) }
   }
   if (level <= 15) {
-    return { rows: 6, cols: 6, numChars: 6, numRooms: seededInt(4, 5, rng) }
+    return { rows: 6, cols: 6, numChars: 5, numRooms: seededInt(4, 5, rng) }
   }
-  // levels 16–30: 7×7 board, 7 chars (hard levels differ in seed/layout, not size)
-  return { rows: 7, cols: 7, numChars: 7, numRooms: seededInt(4, 5, rng) }
+  return { rows: 7, cols: 7, numChars: 6, numRooms: seededInt(4, 5, rng) }
 }
 
 function makeCellId(row: number, col: number): CellId {
@@ -161,16 +165,6 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
   }
 
   return { rows, cols, cells, rooms }
-}
-
-function getOccupiableCells(board: Board): CellId[] {
-  const result: CellId[] = []
-  for (const row of board.cells) {
-    for (const cell of row) {
-      if (isOccupiable(cell)) result.push(cell.id)
-    }
-  }
-  return result
 }
 
 // Unary clue types constrain only the subject character and enable solver pre-filtering.
@@ -379,7 +373,7 @@ export function generatePuzzle(
   const difficulty: 'easy' | 'medium' | 'hard' =
     level <= 10 ? 'easy' : level <= 20 ? 'medium' : 'hard'
 
-  for (let boardAttempt = 0; boardAttempt < 3; boardAttempt++) {
+  for (let boardAttempt = 0; boardAttempt < 5; boardAttempt++) {
     const config = getDifficultyConfig(level, rng)
 
     let board: Board | null = null
@@ -393,65 +387,57 @@ export function generatePuzzle(
     }
     if (!board) continue
 
-    // Step 2: Pick reserved cell (stolen object location)
-    const occupiable = getOccupiableCells(board)
-    if (occupiable.length < config.numChars + 1) continue
-
-    // Step 3: Pick culprit and reserve their room
-    const shuffledOccupiable = seededShuffle(occupiable, rng)
-    const reservedCellId = shuffledOccupiable[0]!
-    const reservedCell = board.cells.flat().find(c => c.id === reservedCellId)!
-    const reservedRoomId = reservedCell.roomId
-
-    // Step 4: Place characters
     const charNames = seededShuffle(CHARACTER_NAMES, rng).slice(0, config.numChars)
     const characters: Character[] = charNames.map((name, i) => ({ id: `char-${i}`, name }))
-    const culprit = characters[0]!
 
-    for (let placeAttempt = 0; placeAttempt < 5; placeAttempt++) {
-      const reservedRoomCells = occupiable.filter(cid => {
-        const c = board!.cells.flat().find(cell => cell.id === cid)
-        return c?.roomId === reservedRoomId && cid !== reservedCellId
-      })
-      if (reservedRoomCells.length === 0) break
+    for (let placeAttempt = 0; placeAttempt < 30; placeAttempt++) {
+      // Shuffle all rows and cols independently, then split:
+      //   rows[0..numChars-1]  → one row per character
+      //   rows[numChars]       → the single FREE row  (stolen-object row)
+      //   cols[0..numChars-1]  → paired with a random permutation of the char cols
+      //   cols[numChars]       → the single FREE col  (stolen-object col)
+      //
+      // Stolen-object cell = board[freeRow][freeCol]. This is the one cell that
+      // remains unoccupied and not in any eliminated row/col, so it's the unique
+      // "glowing" cell after all characters are placed.
+      const allRows = Array.from({ length: config.rows }, (_, i) => i)
+      const allCols = Array.from({ length: config.cols }, (_, i) => i)
+      const shuffledRows = seededShuffle(allRows, rng)
+      const shuffledCols = seededShuffle(allCols, rng)
 
-      const culpritCellId = seededChoice(reservedRoomCells, rng)
+      const freeRow = shuffledRows[config.numChars]!
+      const freeCol = shuffledCols[config.numChars]!
+      const charRows = shuffledRows.slice(0, config.numChars)
+      // Permute char cols independently so (charRows[i], charCols[i]) is random
+      const charCols = seededShuffle(shuffledCols.slice(0, config.numChars), rng)
 
-      const outsideCells = seededShuffle(
-        occupiable.filter(cid => {
-          const c = board!.cells.flat().find(cell => cell.id === cid)
-          return c?.roomId !== reservedRoomId && cid !== culpritCellId
-        }),
-        rng
-      )
+      // Stolen-object cell must be occupiable (player clicks it to accuse)
+      const stolenCell = board.cells[freeRow]![freeCol]!
+      if (!isOccupiable(stolenCell)) continue
 
-      if (outsideCells.length < config.numChars - 1) continue
-
-      const solution: Record<string, CellId> = { [culprit.id]: culpritCellId }
-      const usedRows = new Set([parseInt(culpritCellId.match(/F(\d+)/)![1]!)])
-      const usedCols = new Set([parseInt(culpritCellId.match(/C(\d+)/)![1]!)])
-
+      // Place all characters; each must also be on an occupiable cell
+      const solution: Record<string, CellId> = {}
       let valid = true
-      for (let ci = 1; ci < characters.length; ci++) {
-        const char = characters[ci]!
-        let placed = false
-        for (const cid of outsideCells) {
-          const row = parseInt(cid.match(/F(\d+)/)![1]!)
-          const col = parseInt(cid.match(/C(\d+)/)![1]!)
-          if (usedRows.has(row) || usedCols.has(col)) continue
-          solution[char.id] = cid
-          usedRows.add(row)
-          usedCols.add(col)
-          placed = true
-          break
-        }
-        if (!placed) { valid = false; break }
+      for (let i = 0; i < config.numChars; i++) {
+        const cell = board.cells[charRows[i]!]![charCols[i]!]!
+        if (!isOccupiable(cell)) { valid = false; break }
+        solution[characters[i]!.id] = cell.id
       }
       if (!valid) continue
 
-      const { clues, unique } = synthesizeClues(board, characters, solution, culprit.id, rng)
+      // Exactly one character must share a room with the stolen-object cell.
+      // That character is the culprit: when the player clicks the glowing cell
+      // (stolen object), only one suspect is in that room → unambiguous accusation.
+      const stolenRoomId = stolenCell.roomId
+      const charsInStolenRoom = characters.filter(c => {
+        const cellId = solution[c.id]!
+        return board!.cells.flat().find(x => x.id === cellId)?.roomId === stolenRoomId
+      })
+      if (charsInStolenRoom.length !== 1) continue
 
-      // Synthesis already proved uniqueness via findAllSolutions; skip redundant check.
+      const culprit = charsInStolenRoom[0]!
+
+      const { clues, unique } = synthesizeClues(board, characters, solution, culprit.id, rng)
       if (!unique) continue
 
       return {
@@ -464,7 +450,7 @@ export function generatePuzzle(
         solution: {
           placement: solution,
           culpritId: culprit.id,
-          stolenObjectCellId: reservedCellId,
+          stolenObjectCellId: stolenCell.id,
         },
       }
     }
