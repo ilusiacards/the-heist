@@ -13,6 +13,7 @@ interface Props {
   eliminatedCols: Set<number>
   glowingCellId: CellId | null
   onCellClick: (cell: Cell) => void
+  readOnly?: boolean
 }
 
 function getPlacedChar(cellId: CellId, placement: Partial<Record<string, CellId>>, characters: Character[]) {
@@ -51,7 +52,7 @@ function roomBorderStyle(cell: Cell, board: Board): React.CSSProperties {
 
 export function BoardGrid({
   board, characters, clues, placement,
-  eliminatedRows, eliminatedCols, glowingCellId, onCellClick
+  eliminatedRows, eliminatedCols, glowingCellId, onCellClick, readOnly
 }: Props) {
 
   function cellClasses(cell: Cell): string {
@@ -81,9 +82,11 @@ export function BoardGrid({
       style={{
         gridTemplateColumns: `repeat(${board.cols}, 1fr)`,
         gridTemplateRows: `repeat(${board.rows}, 1fr)`,
+        pointerEvents: readOnly ? 'none' : undefined,
       }}
       role="grid"
       aria-label="Tablero del puzzle"
+      aria-readonly={readOnly}
     >
       {board.cells.flat().map(cell => {
         const placedChar = getPlacedChar(cell.id, placement, characters)

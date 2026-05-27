@@ -8,9 +8,10 @@ const DIFFICULTY_LABELS = ['Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'F�
 
 interface Props {
   onSelectLevel: (level: number) => void
+  onViewSolutions?: () => void
 }
 
-export function LevelSelect({ onSelectLevel }: Props) {
+export function LevelSelect({ onSelectLevel, onViewSolutions }: Props) {
   const progress = loadProgress()
 
   return (
@@ -42,6 +43,12 @@ export function LevelSelect({ onSelectLevel }: Props) {
           )
         })}
       </div>
+
+      {onViewSolutions && (
+        <button className={styles.solutionsBtn} onClick={onViewSolutions}>
+          Ver soluciones
+        </button>
+      )}
     </div>
   )
 }

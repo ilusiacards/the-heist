@@ -6,6 +6,7 @@ import { PlacementDialog } from '../components/PlacementDialog'
 import { CluePanel } from '../components/CluePanel'
 import { CharacterTray } from '../components/CharacterTray'
 import { HelpOverlay } from '../components/HelpOverlay'
+import { computeEliminatedSets } from '../logic/boardUtils'
 import styles from './GameScreen.module.css'
 
 interface Props {
@@ -79,19 +80,9 @@ export function GameScreen({ level, onWin, onBack }: Props) {
   const puzzle = gameState.status === 'playing' ? gameState.puzzle : null
 
   // Compute eliminated rows/cols
-  const eliminatedRows = new Set<number>()
-  const eliminatedCols = new Set<number>()
-  if (puzzle) {
-    for (const char of puzzle.characters) {
-      const cellId = placement[char.id]
-      if (!cellId) continue
-      const cell = puzzle.board.cells.flat().find(c => c.id === cellId)
-      if (cell) {
-        eliminatedRows.add(cell.row)
-        eliminatedCols.add(cell.col)
-      }
-    }
-  }
+  const { eliminatedRows, eliminatedCols } = puzzle
+    ? computeEliminatedSets(puzzle.board, puzzle.characters, placement)
+    : { eliminatedRows: new Set<number>(), eliminatedCols: new Set<number>() }
 
   // Check if all N characters are placed → find glowing cell (T3)
   const allPlaced = puzzle
