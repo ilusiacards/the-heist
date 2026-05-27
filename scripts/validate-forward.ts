@@ -4,7 +4,7 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { evaluateClue } from '../src/logic/evaluateClue'
 import { isOccupiable } from '../src/types'
-import type { Board, Character, Clue, CellId, Cell } from '../src/types'
+import type { Board, Character, Clue, CellId } from '../src/types'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUZZLE_DIR = join(__dirname, '..', 'public', 'puzzles')
