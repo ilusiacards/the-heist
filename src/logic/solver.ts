@@ -38,27 +38,22 @@ function propagate(
   charId: string,
   cellId: CellId,
   candidates: Record<string, Set<CellId>>,
-  characters: Character[]
+  characters: Character[],
+  cellCoords: Map<CellId, { row: number; col: number }>
 ): Record<string, Set<CellId>> {
   const next: Record<string, Set<CellId>> = {}
-  const cell = parseCellId(cellId)
+  const cell = cellCoords.get(cellId)!
   for (const char of characters) {
     if (char.id === charId || placement[char.id] !== undefined) continue
     next[char.id] = new Set<CellId>()
     for (const cid of candidates[char.id] ?? []) {
-      const c = parseCellId(cid)
+      const c = cellCoords.get(cid)!
       // Row+col exclusion
       if (c.row === cell.row || c.col === cell.col) continue
       next[char.id].add(cid)
     }
   }
   return next
-}
-
-function parseCellId(id: CellId): { row: number; col: number } {
-  const m = id.match(/^F(\d+)C(\d+)$/)
-  if (!m) throw new Error(`Invalid CellId: ${id}`)
-  return { row: parseInt(m[1]!), col: parseInt(m[2]!) }
 }
 
 function solve(
@@ -69,7 +64,8 @@ function solve(
   candidates: Record<string, Set<CellId>>,
   results: Array<Record<string, CellId>>,
   limit: number,
-  depth: number
+  depth: number,
+  cellCoords: Map<CellId, { row: number; col: number }>
 ): void {
   if (results.length >= limit) return
 
@@ -78,7 +74,7 @@ function solve(
     // All placed — verify all clues pass
     const full = placement as Record<string, CellId>
     for (const clue of clues) {
-      const result = evaluateClue(clue, full, board, 'partial')
+      const result = evaluateClue(clue, full, board, 'full')
       if (result === false) return
     }
     results.push({ ...full })
@@ -100,7 +96,7 @@ function solve(
     }
     if (!feasible) continue
 
-    const nextCandidates = propagate(newPlacement, charId, cellId, candidates, characters)
+    const nextCandidates = propagate(newPlacement, charId, cellId, candidates, characters, cellCoords)
     // Check if any remaining character has 0 candidates
     let dead = false
     for (const char of characters) {
@@ -112,7 +108,7 @@ function solve(
     }
     if (dead) continue
 
-    solve(board, characters, clues, newPlacement, nextCandidates, results, limit, depth + 1)
+    solve(board, characters, clues, newPlacement, nextCandidates, results, limit, depth + 1, cellCoords)
     if (results.length >= limit) return
   }
 }
@@ -125,13 +121,34 @@ export function findAllSolutions(
 ): Array<Record<string, CellId>> {
   const occupiable = getOccupiableCells(board)
 
+  // Pre-compute cell coordinates to avoid repeated regex parsing in hot path
+  const cellCoords = new Map<CellId, { row: number; col: number }>()
+  for (const row of board.cells) {
+    for (const cell of row) {
+      cellCoords.set(cell.id, { row: cell.row, col: cell.col })
+    }
+  }
+
   const candidates: Record<string, Set<CellId>> = {}
   for (const char of characters) {
     candidates[char.id] = new Set(occupiable)
   }
 
+  // Pre-filter candidates: remove cells that definitely violate a clue for each character.
+  // evaluateClue in 'partial' mode returns false only when the cell is provably wrong
+  // (unary clues like in_room, on_object, in_corner); relational clues return 'unknown'.
+  // This dramatically reduces the search space before backtracking starts.
+  for (const clue of clues) {
+    const charCandidates = candidates[clue.subject]
+    if (!charCandidates) continue
+    for (const cellId of [...charCandidates]) {
+      const result = evaluateClue(clue, { [clue.subject]: cellId }, board, 'partial')
+      if (result === false) charCandidates.delete(cellId)
+    }
+  }
+
   const results: Array<Record<string, CellId>> = []
-  solve(board, characters, clues, {}, candidates, results, limit, 0)
+  solve(board, characters, clues, {}, candidates, results, limit, 0, cellCoords)
   return results
 }
 
