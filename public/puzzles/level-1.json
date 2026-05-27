@@ -265,42 +265,40 @@
   "characters": [
     {
       "id": "char-0",
-      "name": "Elena"
+      "name": "Lola"
     },
     {
       "id": "char-1",
-      "name": "Bruno"
+      "name": "Ana"
     },
     {
       "id": "char-2",
-      "name": "Marco"
+      "name": "Celia"
     },
     {
       "id": "char-3",
-      "name": "Diego"
+      "name": "Nadia"
     }
   ],
   "clues": [
     {
-      "id": "clue-8",
+      "id": "clue-2",
       "type": "on_object",
-      "subject": "char-2",
-      "params": {
-        "objectType": "alfombra"
-      }
-    },
-    {
-      "id": "clue-31",
-      "type": "in_room",
-      "subject": "char-0",
-      "params": {
-        "roomId": "room-0"
-      }
-    },
-    {
-      "id": "clue-56",
-      "type": "in_room",
       "subject": "char-1",
+      "params": {
+        "objectType": "silla"
+      }
+    },
+    {
+      "id": "clue-33",
+      "type": "in_corner",
+      "subject": "char-2",
+      "params": {}
+    },
+    {
+      "id": "clue-50",
+      "type": "in_room",
+      "subject": "char-3",
       "params": {
         "roomId": "room-3"
       }
@@ -308,40 +306,26 @@
     {
       "id": "clue-82",
       "type": "in_room",
-      "subject": "char-3",
-      "params": {
-        "roomId": "room-2"
-      }
-    },
-    {
-      "id": "clue-102",
-      "type": "not_next_to_window",
-      "subject": "char-1",
-      "params": {}
-    },
-    {
-      "id": "clue-133",
-      "type": "not_in_corner",
       "subject": "char-0",
-      "params": {}
+      "params": {
+        "roomId": "room-1"
+      }
     },
     {
-      "id": "clue-162",
-      "type": "in_room",
-      "subject": "char-2",
-      "params": {
-        "roomId": "room-2"
-      }
+      "id": "clue-121",
+      "type": "next_to_window",
+      "subject": "char-3",
+      "params": {}
     }
   ],
   "solution": {
     "placement": {
-      "char-0": "F2C0",
-      "char-1": "F1C4",
-      "char-2": "F3C2",
-      "char-3": "F4C1"
+      "char-0": "F2C1",
+      "char-1": "F1C2",
+      "char-2": "F4C4",
+      "char-3": "F0C3"
     },
-    "culpritId": "char-0",
-    "stolenObjectCellId": "F0C0"
+    "culpritId": "char-2",
+    "stolenObjectCellId": "F3C0"
   }
 }
