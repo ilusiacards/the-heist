@@ -282,35 +282,7 @@
   ],
   "clues": [
     {
-      "id": "clue-12",
-      "type": "same_room_as",
-      "subject": "char-2",
-      "params": {
-        "otherId": "char-3"
-      }
-    },
-    {
-      "id": "clue-31",
-      "type": "in_room",
-      "subject": "char-1",
-      "params": {
-        "roomId": "room-3"
-      }
-    },
-    {
-      "id": "clue-52",
-      "type": "not_next_to_window",
-      "subject": "char-1",
-      "params": {}
-    },
-    {
-      "id": "clue-83",
-      "type": "not_in_corner",
-      "subject": "char-0",
-      "params": {}
-    },
-    {
-      "id": "clue-120",
+      "id": "clue-8",
       "type": "on_object",
       "subject": "char-2",
       "params": {
@@ -318,11 +290,47 @@
       }
     },
     {
-      "id": "clue-144",
+      "id": "clue-31",
       "type": "in_room",
       "subject": "char-0",
       "params": {
         "roomId": "room-0"
+      }
+    },
+    {
+      "id": "clue-56",
+      "type": "in_room",
+      "subject": "char-1",
+      "params": {
+        "roomId": "room-3"
+      }
+    },
+    {
+      "id": "clue-82",
+      "type": "in_room",
+      "subject": "char-3",
+      "params": {
+        "roomId": "room-2"
+      }
+    },
+    {
+      "id": "clue-102",
+      "type": "not_next_to_window",
+      "subject": "char-1",
+      "params": {}
+    },
+    {
+      "id": "clue-133",
+      "type": "not_in_corner",
+      "subject": "char-0",
+      "params": {}
+    },
+    {
+      "id": "clue-162",
+      "type": "in_room",
+      "subject": "char-2",
+      "params": {
+        "roomId": "room-2"
       }
     }
   ],

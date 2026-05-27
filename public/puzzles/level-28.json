@@ -500,39 +500,7 @@
   ],
   "clues": [
     {
-      "id": "clue-3",
-      "type": "not_same_room_as",
-      "subject": "char-1",
-      "params": {
-        "otherId": "char-0"
-      }
-    },
-    {
-      "id": "clue-69",
-      "type": "not_same_room_as",
-      "subject": "char-3",
-      "params": {
-        "otherId": "char-2"
-      }
-    },
-    {
-      "id": "clue-136",
-      "type": "same_room_as",
-      "subject": "char-2",
-      "params": {
-        "otherId": "char-5"
-      }
-    },
-    {
-      "id": "clue-200",
-      "type": "same_room_as",
-      "subject": "char-4",
-      "params": {
-        "otherId": "char-6"
-      }
-    },
-    {
-      "id": "clue-276",
+      "id": "clue-38",
       "type": "on_object",
       "subject": "char-2",
       "params": {
@@ -540,27 +508,43 @@
       }
     },
     {
-      "id": "clue-326",
-      "type": "not_same_room_as",
-      "subject": "char-6",
-      "params": {
-        "otherId": "char-3"
-      }
-    },
-    {
-      "id": "clue-403",
+      "id": "clue-74",
       "type": "in_corner",
       "subject": "char-3",
       "params": {}
     },
     {
-      "id": "clue-495",
+      "id": "clue-183",
+      "type": "in_room",
+      "subject": "char-5",
+      "params": {
+        "roomId": "room-3"
+      }
+    },
+    {
+      "id": "clue-210",
+      "type": "in_room",
+      "subject": "char-4",
+      "params": {
+        "roomId": "room-4"
+      }
+    },
+    {
+      "id": "clue-274",
+      "type": "in_room",
+      "subject": "char-1",
+      "params": {
+        "roomId": "room-1"
+      }
+    },
+    {
+      "id": "clue-339",
       "type": "in_corner",
       "subject": "char-6",
       "params": {}
     },
     {
-      "id": "clue-530",
+      "id": "clue-393",
       "type": "in_room",
       "subject": "char-3",
       "params": {
@@ -568,19 +552,11 @@
       }
     },
     {
-      "id": "clue-609",
+      "id": "clue-451",
       "type": "not_same_room_as",
       "subject": "char-0",
       "params": {
-        "otherId": "char-3"
-      }
-    },
-    {
-      "id": "clue-658",
-      "type": "in_room",
-      "subject": "char-1",
-      "params": {
-        "roomId": "room-1"
+        "otherId": "char-1"
       }
     }
   ],
