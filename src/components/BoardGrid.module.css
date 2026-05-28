@@ -246,3 +246,17 @@
   animation: cajaLid 3s ease-in-out infinite;
   transform-box: fill-box;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animSilla,
+  .animMedallion,
+  .animCama,
+  .animMesa,
+  .animTvScreen,
+  .animTvLed,
+  .animPlanta,
+  .animBookPeek,
+  .animCajaLid {
+    animation: none;
+  }
+}
