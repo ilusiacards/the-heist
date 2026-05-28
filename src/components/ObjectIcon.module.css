@@ -14,30 +14,52 @@
   50%       { transform: scale(1.12); opacity: 1; }
 }
 
-@keyframes bancoSag {
-  0%, 100% { transform: scaleY(1); }
-  50%       { transform: scaleY(0.96); }
-}
-
-@keyframes extintorGauge {
-  0%, 40%, 60%, 100% { opacity: 1; }
-  50%                 { opacity: 0.45; }
-}
-
-@keyframes estatuaPulse {
-  0%, 100% { filter: drop-shadow(0 0 1px #3d1a00); }
-  50%       { filter: drop-shadow(0 0 4px #b45309); }
-}
-
-@keyframes papeleraLid {
-  0%, 100% { transform: rotate(0deg); }
-  40%       { transform: rotate(-3deg); }
-  60%       { transform: rotate(3deg); }
-}
-
 @keyframes plantaGrow {
   0%, 100% { transform: scaleY(1) rotate(-1.5deg); }
   50%       { transform: scaleY(1.06) rotate(1.5deg); }
+}
+
+/* ── Variante A: "Vivo" — animaciones con personalidad ────────── */
+
+/* Banco: se mece como una hamaca */
+@keyframes bancoMece {
+  0%, 100% { transform: rotate(0deg); }
+  20%       { transform: rotate(-3deg); }
+  50%       { transform: rotate(2.5deg); }
+  75%       { transform: rotate(-1.5deg); }
+}
+
+/* Extintor: cuerpo presuriza (scaleY/X alternados) */
+@keyframes extintorPresion {
+  0%, 55%, 100% { transform: scaleY(1) scaleX(1); }
+  20%           { transform: scaleY(1.04) scaleX(0.97); }
+  40%           { transform: scaleY(0.97) scaleX(1.03); }
+}
+
+/* Extintor: pitorro tiembla */
+@keyframes extintorNozzle {
+  0%, 100% { transform: rotate(0deg); }
+  40%       { transform: rotate(-8deg); }
+  60%       { transform: rotate(4deg); }
+}
+
+/* Columna: destello dorado que sube por el fuste (rango: y=16→y=6 dentro del shaft) */
+@keyframes columnaLuz {
+  0%, 70%, 100% { opacity: 0; transform: translateY(10px); }
+  40%           { opacity: 0.7; transform: translateY(0px); }
+}
+
+/* Estatua: brazo izquierdo sube (rotación positiva = sentido horario = tip sube) */
+@keyframes estatuaBrazo {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  30%           { transform: rotate(18deg); }
+}
+
+/* Papelera: tapa se abre hacia arriba (positivo = lado izquierdo sube) */
+@keyframes papeleraCome {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  15%           { transform: rotate(18deg); }
+  35%           { transform: rotate(10deg); }
 }
 
 .animSilla {
@@ -52,39 +74,58 @@
   transform-box: fill-box;
 }
 
-.animBanco {
-  animation: bancoSag 3s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
-.animExtintor {
-  animation: extintorGauge 4s ease-in-out infinite;
-}
-
-.animEstatua {
-  animation: estatuaPulse 5s ease-in-out infinite;
-}
-
-.animPapelera {
-  animation: papeleraLid 3.5s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
 .animPlanta {
   animation: plantaGrow 2.2s ease-in-out infinite;
   transform-origin: center bottom;
   transform-box: fill-box;
 }
 
+/* Banco: mece el SVG completo desde el fondo */
+.animBancoMece {
+  animation: bancoMece 2.8s ease-in-out infinite;
+  transform-origin: center bottom;
+  transform-box: fill-box;
+}
+
+/* Extintor: cuerpo presuriza */
+.animExtintorBody {
+  animation: extintorPresion 3s ease-in-out infinite;
+  transform-origin: center bottom;
+  transform-box: fill-box;
+}
+
+/* Extintor: pitorro gira desde su punto de anclaje (16.5, 7.5) en espacio SVG */
+.animExtintorNozzle {
+  animation: extintorNozzle 3s ease-in-out 0.4s infinite;
+  transform-origin: 16.5px 7.5px;
+}
+
+/* Columna: rectángulo de luz que sube (solo translate + opacity) */
+.animColumnaLuz {
+  animation: columnaLuz 4s ease-in-out infinite;
+}
+
+/* Estatua: brazo izquierdo gira desde el hombro (9.5, 10) en espacio SVG */
+.animEstatuaBrazo {
+  animation: estatuaBrazo 4s ease-in-out infinite;
+  transform-origin: 9.5px 10px;
+}
+
+/* Papelera: tapa se abre desde el lado derecho (bisagra derecha) */
+.animPapeleraCome {
+  animation: papeleraCome 3.5s ease-in-out infinite;
+  transform-origin: 20.5px 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animSilla,
   .animMedallion,
-  .animBanco,
-  .animExtintor,
-  .animEstatua,
-  .animPapelera,
+  .animBancoMece,
+  .animExtintorBody,
+  .animExtintorNozzle,
+  .animColumnaLuz,
+  .animEstatuaBrazo,
+  .animPapeleraCome,
   .animPlanta {
     animation: none;
   }
