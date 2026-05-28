@@ -207,7 +207,7 @@ function ObjectIcon({ obj }: { obj: string }) {
       </svg>
     ),
     estanteria: (
-      <svg viewBox="0 0 24 24" fill="none" width="100%" height="100%">
+      <svg viewBox="0 0 24 24" fill="none" width="100%" height="100%" overflow="visible">
         <rect x="2" y="2" width="20" height="20" rx="1" fill="#78350f" stroke="#3d1a00" strokeWidth="1"/>
         <rect x="2" y="8.5" width="20" height="1.5" fill="#3d1a00"/>
         <rect x="2" y="15.5" width="20" height="1.5" fill="#3d1a00"/>
