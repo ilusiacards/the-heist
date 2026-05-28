@@ -15,6 +15,8 @@
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   max-width: 400px;
+  max-height: 85dvh;
+  overflow-y: auto;
   width: 100%;
   box-shadow: var(--shadow-md);
 }
@@ -140,7 +142,6 @@
 
 .legendIconWrapBlocked {
   background: #f5f0e8;
-  opacity: 0.85;
 }
 
 .legendXMark {
@@ -149,15 +150,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 800;
-  color: #dc2626;
-  opacity: 0.75;
+  font-size: 20px;
+  font-weight: 900;
+  color: #b91c1c;
+  opacity: 0.9;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
   pointer-events: none;
 }
 
 .legendLabel {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--color-text-muted);
   text-align: center;
   line-height: 1.2;
