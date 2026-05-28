@@ -1,11 +1,28 @@
 import type { Board, Character, Clue, SameRoomAsClue } from '../types'
+import { objectClueLabel } from './objectMeta'
 
 function charName(id: string, characters: Character[]): string {
   return characters.find(c => c.id === id)?.name ?? id
 }
 
+// Fallback map for pre-generated puzzles that lack articleName on Room
+const ROOM_ARTICLE_BY_NAME: Record<string, string> = {
+  'Dormitorio': 'el dormitorio',
+  'Cocina': 'la cocina',
+  'Sala': 'la sala',
+  'Baño': 'el baño',
+  'Biblioteca': 'la biblioteca',
+  'Estudio': 'el estudio',
+  'Comedor': 'el comedor',
+  'Pasillo': 'el pasillo',
+  'Taller': 'el taller',
+  'Bodega': 'la bodega',
+}
+
 function roomName(id: string, board: Board): string {
-  return board.rooms.find(r => r.id === id)?.name ?? id
+  const room = board.rooms.find(r => r.id === id)
+  if (!room) return id
+  return room.articleName ?? ROOM_ARTICLE_BY_NAME[room.name] ?? room.name.toLowerCase()
 }
 
 const DIRECTION_ES: Record<string, string> = {
@@ -13,17 +30,6 @@ const DIRECTION_ES: Record<string, string> = {
   south: 'al sur',
   east: 'al este',
   west: 'al oeste',
-}
-
-const OBJECT_ES: Record<string, string> = {
-  silla: 'la silla',
-  alfombra: 'la alfombra',
-  cama: 'la cama',
-  mesa: 'la mesa',
-  tv: 'el televisor',
-  planta: 'la planta',
-  estanteria: 'la estantería',
-  caja: 'la caja',
 }
 
 // Priority order for selecting the "main" clause of a combined sentence
@@ -63,15 +69,15 @@ function mainClauseText(clue: Clue, characters: Character[], board: Board): stri
     case 'not_next_to':
       return `no estaba al lado de ${charName(clue.params.otherId, characters)}`
     case 'on_object':
-      return `estaba sobre ${OBJECT_ES[clue.params.objectType as string] ?? clue.params.objectType}`
+      return `estaba sobre ${objectClueLabel(clue.params.objectType as string)}`
     case 'not_on_object':
-      return `no estaba sobre ${OBJECT_ES[clue.params.objectType as string] ?? clue.params.objectType}`
+      return `no estaba sobre ${objectClueLabel(clue.params.objectType as string)}`
     case 'only_one_on_object':
-      return `era el único sobre ${OBJECT_ES[clue.params.objectType as string] ?? clue.params.objectType}`
+      return `era el único sobre ${objectClueLabel(clue.params.objectType as string)}`
     case 'next_to_window':
-      return `estaba junto a una ventana`
+      return `estaba junto a un cuadro`
     case 'not_next_to_window':
-      return `no estaba junto a ninguna ventana`
+      return `no estaba junto a ningún cuadro`
     case 'n_cols_direction_of':
       return `estaba exactamente ${clue.params.n} columna${clue.params.n !== 1 ? 's' : ''} ${DIRECTION_ES[clue.params.direction] ?? clue.params.direction} de ${charName(clue.params.otherId, characters)}`
     case 'n_rows_direction_of':
@@ -107,15 +113,15 @@ function subordinateClauseText(clue: Clue, characters: Character[], board: Board
     case 'not_next_to':
       return `no al lado de ${charName(clue.params.otherId, characters)}`
     case 'on_object':
-      return `sobre ${OBJECT_ES[clue.params.objectType as string] ?? clue.params.objectType}`
+      return `sobre ${objectClueLabel(clue.params.objectType as string)}`
     case 'not_on_object':
-      return `no sobre ${OBJECT_ES[clue.params.objectType as string] ?? clue.params.objectType}`
+      return `no sobre ${objectClueLabel(clue.params.objectType as string)}`
     case 'only_one_on_object':
-      return `único sobre ${OBJECT_ES[clue.params.objectType as string] ?? clue.params.objectType}`
+      return `único sobre ${objectClueLabel(clue.params.objectType as string)}`
     case 'next_to_window':
-      return `junto a una ventana`
+      return `junto a un cuadro`
     case 'not_next_to_window':
-      return `sin ventanas cercanas`
+      return `sin cuadros cercanos`
     case 'n_cols_direction_of':
       return `${clue.params.n} col${clue.params.n !== 1 ? 's' : ''} ${DIRECTION_ES[clue.params.direction] ?? clue.params.direction} de ${charName(clue.params.otherId, characters)}`
     case 'n_rows_direction_of':

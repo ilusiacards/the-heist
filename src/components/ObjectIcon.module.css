@@ -14,43 +14,30 @@
   50%       { transform: scale(1.12); opacity: 1; }
 }
 
-@keyframes camaSleep {
-  0%   { transform: translateY(0); }
-  30%  { transform: translateY(-2px); }
-  60%  { transform: translateY(-1px); }
-  80%  { transform: translateY(-2.5px); }
-  100% { transform: translateY(0); }
+@keyframes bancoSag {
+  0%, 100% { transform: scaleY(1); }
+  50%       { transform: scaleY(0.96); }
 }
 
-@keyframes mesaLevitate {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-2px); }
+@keyframes extintorGauge {
+  0%, 40%, 60%, 100% { opacity: 1; }
+  50%                 { opacity: 0.45; }
 }
 
-@keyframes tvFlicker {
-  0%, 47%, 53%, 100% { opacity: 1; }
-  49%  { opacity: 0.55; }
-  51%  { opacity: 0.7; }
+@keyframes estatuaPulse {
+  0%, 100% { filter: drop-shadow(0 0 1px #3d1a00); }
+  50%       { filter: drop-shadow(0 0 4px #b45309); }
 }
 
-@keyframes tvLedBlink {
-  0%, 45%, 55%, 100% { opacity: 1; }
-  50%                 { opacity: 0.2; }
+@keyframes papeleraLid {
+  0%, 100% { transform: rotate(0deg); }
+  40%       { transform: rotate(-3deg); }
+  60%       { transform: rotate(3deg); }
 }
 
 @keyframes plantaGrow {
   0%, 100% { transform: scaleY(1) rotate(-1.5deg); }
   50%       { transform: scaleY(1.06) rotate(1.5deg); }
-}
-
-@keyframes bookPeek {
-  0%, 70%, 100% { transform: translateY(0); }
-  35%            { transform: translateY(-3px); }
-}
-
-@keyframes cajaLid {
-  0%, 100% { transform: translateY(0); }
-  40%, 60% { transform: translateY(-2px); }
 }
 
 .animSilla {
@@ -65,22 +52,24 @@
   transform-box: fill-box;
 }
 
-.animCama {
-  animation: camaSleep 2.8s ease-in-out infinite;
+.animBanco {
+  animation: bancoSag 3s ease-in-out infinite;
   transform-origin: center;
   transform-box: fill-box;
 }
 
-.animMesa {
-  animation: mesaLevitate 2.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+.animExtintor {
+  animation: extintorGauge 4s ease-in-out infinite;
 }
 
-.animTvScreen {
-  animation: tvFlicker 3.5s linear infinite;
+.animEstatua {
+  animation: estatuaPulse 5s ease-in-out infinite;
 }
 
-.animTvLed {
-  animation: tvLedBlink 1.8s ease-in-out infinite;
+.animPapelera {
+  animation: papeleraLid 3.5s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
 }
 
 .animPlanta {
@@ -89,26 +78,14 @@
   transform-box: fill-box;
 }
 
-.animBookPeek {
-  animation: bookPeek 3.5s ease-in-out infinite;
-  transform-box: fill-box;
-}
-
-.animCajaLid {
-  animation: cajaLid 3s ease-in-out infinite;
-  transform-box: fill-box;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .animSilla,
   .animMedallion,
-  .animCama,
-  .animMesa,
-  .animTvScreen,
-  .animTvLed,
-  .animPlanta,
-  .animBookPeek,
-  .animCajaLid {
+  .animBanco,
+  .animExtintor,
+  .animEstatua,
+  .animPapelera,
+  .animPlanta {
     animation: none;
   }
 }

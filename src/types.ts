@@ -25,6 +25,7 @@ export interface Cell {
 export interface Room {
   id: string
   name: string
+  articleName?: string
   cells: CellId[]
 }
 
