@@ -96,6 +96,7 @@
   flex: 1;
   min-height: 0;
   max-height: calc(100vh - 200px);
+  max-width: calc(100vh - 200px);
   aspect-ratio: 1;
 }
 
@@ -144,6 +145,7 @@
 
   .boardWrapper {
     max-height: 60vw;
+    max-width: 60vw;
   }
 
   .sidebar {
