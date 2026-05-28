@@ -1,8 +1,20 @@
 import { useEffect, useRef } from 'react'
+import { ObjectIcon } from './ObjectIcon'
 import styles from './HelpOverlay.module.css'
 
 interface Props {
   onClose: () => void
+}
+
+const OBJECT_LABELS: Record<string, string> = {
+  silla: 'Silla',
+  alfombra: 'Alfombra',
+  cama: 'Cama',
+  mesa: 'Mesa',
+  tv: 'TV',
+  planta: 'Planta',
+  estanteria: 'Estantería',
+  caja: 'Caja',
 }
 
 // T14: HelpOverlay component
@@ -50,6 +62,35 @@ export function HelpOverlay({ onClose }: Props) {
             <span className={styles.icon}>🔒</span>
             Cada puzzle tiene exactamente una solución. No hay que adivinar.
           </p>
+        </div>
+        <div className={styles.legend}>
+          <div className={styles.legendSection}>
+            <span className={`${styles.legendPill} ${styles.legendPillGreen}`}>✓ Ocupable</span>
+            <div className={styles.legendIcons}>
+              {(['silla', 'alfombra', 'cama'] as const).map(obj => (
+                <div key={obj} className={styles.legendItem}>
+                  <div className={styles.legendIconWrap}>
+                    <span className={styles.legendIconInner}><ObjectIcon obj={obj} /></span>
+                  </div>
+                  <span className={styles.legendLabel}>{OBJECT_LABELS[obj]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.legendSection}>
+            <span className={`${styles.legendPill} ${styles.legendPillRed}`}>✕ No ocupable</span>
+            <div className={styles.legendIcons}>
+              {(['mesa', 'tv', 'planta', 'estanteria', 'caja'] as const).map(obj => (
+                <div key={obj} className={styles.legendItem}>
+                  <div className={`${styles.legendIconWrap} ${styles.legendIconWrapBlocked}`}>
+                    <span className={styles.legendIconInner}><ObjectIcon obj={obj} /></span>
+                    <span className={styles.legendXMark} aria-hidden="true">✕</span>
+                  </div>
+                  <span className={styles.legendLabel}>{OBJECT_LABELS[obj]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <button className={styles.gotItBtn} onClick={onClose}>¡Entendido!</button>
       </div>
