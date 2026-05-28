@@ -43,23 +43,23 @@
   60%       { transform: rotate(4deg); }
 }
 
-/* Columna: destello dorado que sube por el fuste */
+/* Columna: destello dorado que sube por el fuste (rango: y=16→y=6 dentro del shaft) */
 @keyframes columnaLuz {
-  0%, 70%, 100% { opacity: 0; transform: translateY(12px); }
-  40%           { opacity: 0.65; transform: translateY(-1px); }
+  0%, 70%, 100% { opacity: 0; transform: translateY(10px); }
+  40%           { opacity: 0.7; transform: translateY(0px); }
 }
 
-/* Estatua: brazo izquierdo sube y baja */
+/* Estatua: brazo izquierdo sube (rotación positiva = sentido horario = tip sube) */
 @keyframes estatuaBrazo {
   0%, 60%, 100% { transform: rotate(0deg); }
-  30%           { transform: rotate(-18deg); }
+  30%           { transform: rotate(18deg); }
 }
 
-/* Papelera: tapa se abre y cierra ("come") */
+/* Papelera: tapa se abre hacia arriba (positivo = lado izquierdo sube) */
 @keyframes papeleraCome {
   0%, 55%, 100% { transform: rotate(0deg); }
-  15%           { transform: rotate(-18deg); }
-  35%           { transform: rotate(-10deg); }
+  15%           { transform: rotate(18deg); }
+  35%           { transform: rotate(10deg); }
 }
 
 .animSilla {
@@ -96,7 +96,7 @@
 
 /* Extintor: pitorro gira desde su punto de anclaje (16.5, 7.5) en espacio SVG */
 .animExtintorNozzle {
-  animation: extintorNozzle 3s ease-in-out infinite;
+  animation: extintorNozzle 3s ease-in-out 0.4s infinite;
   transform-origin: 16.5px 7.5px;
 }
 
