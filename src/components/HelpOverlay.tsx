@@ -1,20 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { ObjectIcon } from './ObjectIcon'
+import { objectLabel } from '../logic/objectMeta'
 import styles from './HelpOverlay.module.css'
 
 interface Props {
   onClose: () => void
-}
-
-const OBJECT_LABELS: Record<string, string> = {
-  silla: 'Silla',
-  alfombra: 'Alfombra',
-  cama: 'Cama',
-  mesa: 'Mesa',
-  tv: 'TV',
-  planta: 'Planta',
-  estanteria: 'Estantería',
-  caja: 'Caja',
 }
 
 // T14: HelpOverlay component
@@ -72,7 +62,7 @@ export function HelpOverlay({ onClose }: Props) {
                   <div className={styles.legendIconWrap}>
                     <span className={styles.legendIconInner}><ObjectIcon obj={obj} /></span>
                   </div>
-                  <span className={styles.legendLabel}>{OBJECT_LABELS[obj]}</span>
+                  <span className={styles.legendLabel}>{objectLabel(obj)}</span>
                 </div>
               ))}
             </div>
@@ -86,7 +76,7 @@ export function HelpOverlay({ onClose }: Props) {
                     <span className={styles.legendIconInner}><ObjectIcon obj={obj} /></span>
                     <span className={styles.legendXMark} aria-hidden="true">✕</span>
                   </div>
-                  <span className={styles.legendLabel}>{OBJECT_LABELS[obj]}</span>
+                  <span className={styles.legendLabel}>{objectLabel(obj)}</span>
                 </div>
               ))}
             </div>

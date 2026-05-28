@@ -23,6 +23,19 @@ const ROOM_NAMES = [
   'Estudio', 'Comedor', 'Pasillo', 'Taller', 'Bodega',
 ]
 
+const ROOM_ARTICLES: Record<string, string> = {
+  'Dormitorio': 'el dormitorio',
+  'Cocina':     'la cocina',
+  'Sala':       'la sala',
+  'Baño':       'el baño',
+  'Biblioteca': 'la biblioteca',
+  'Estudio':    'el estudio',
+  'Comedor':    'el comedor',
+  'Pasillo':    'el pasillo',
+  'Taller':     'el taller',
+  'Bodega':     'la bodega',
+}
+
 const OBJECT_TYPES: Array<Cell['object']> = [
   'silla', 'alfombra', 'cama', 'mesa', 'tv', 'planta', 'estanteria', 'caja',
   undefined, undefined, undefined, // bias toward empty cells
@@ -47,7 +60,12 @@ function getDifficultyConfig(level: number, rng: () => number): BoardConfig {
   if (level <= 15) {
     return { rows: 6, cols: 6, numChars: 5, numRooms: seededInt(4, 5, rng) }
   }
-  return { rows: 7, cols: 7, numChars: 6, numRooms: seededInt(4, 5, rng) }
+  if (level <= 20) {
+    return { rows: 7, cols: 7, numChars: 6, numRooms: seededInt(4, 5, rng) }
+  }
+  // 8×8: benchmark confirmed ~20s/puzzle avg (passes <40s threshold)
+  // 9×9 and 10×10 deferred — exceed 40s threshold with current solver
+  return { rows: 8, cols: 8, numChars: 7, numRooms: seededInt(5, 6, rng) }
 }
 
 function makeCellId(row: number, col: number): CellId {
@@ -102,11 +120,15 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
   }
 
   // Build rooms
-  const rooms: Room[] = Array.from({ length: numRooms }, (_, i) => ({
-    id: `room-${i}`,
-    name: ROOM_NAMES[i] ?? `Habitación ${i + 1}`,
-    cells: [],
-  }))
+  const rooms: Room[] = Array.from({ length: numRooms }, (_, i) => {
+    const name = ROOM_NAMES[i] ?? `Habitación ${i + 1}`
+    return {
+      id: `room-${i}`,
+      name,
+      articleName: ROOM_ARTICLES[name] ?? name.toLowerCase(),
+      cells: [],
+    }
+  })
 
   // Assign objects and windows
   const cells: Cell[][] = Array.from({ length: rows }, (_, row) =>

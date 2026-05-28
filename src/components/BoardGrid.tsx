@@ -111,9 +111,14 @@ export function BoardGrid({
               <span className={styles.roomLabel}>{board.rooms.find(r => r.id === cell.roomId)?.name}</span>
             )}
 
-            {/* Window markers */}
+            {/* Cuadro (painting) markers on walls */}
             {cell.windows.map(side => (
-              <span key={side} className={`${styles.window} ${styles[`window_${side}`]}`} aria-hidden="true" />
+              <span key={side} className={`${styles.cuadro} ${styles[`cuadro_${side}`]}`} aria-hidden="true">
+                <svg viewBox="0 0 10 8" width="10" height="8" fill="none">
+                  <rect x="0.5" y="0.5" width="9" height="7" rx="0.8" fill="none" stroke="#78350f" strokeWidth="1.2"/>
+                  <rect x="1.5" y="1.5" width="7" height="5" rx="0.4" fill="#fde68a" fillOpacity="0.45"/>
+                </svg>
+              </span>
             ))}
 
             {/* Object icon */}
