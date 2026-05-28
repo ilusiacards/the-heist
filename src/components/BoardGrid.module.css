@@ -71,8 +71,8 @@
 }
 
 .objectIcon {
-  width: clamp(14px, 2.8vw, 22px);
-  height: clamp(14px, 2.8vw, 22px);
+  width: 58%;
+  aspect-ratio: 1;
   opacity: 0.85;
   pointer-events: none;
   display: block;
