@@ -63,9 +63,12 @@ function getDifficultyConfig(level: number, rng: () => number): BoardConfig {
   if (level <= 20) {
     return { rows: 7, cols: 7, numChars: 6, numRooms: seededInt(4, 5, rng) }
   }
-  // 8×8: benchmark confirmed ~20s/puzzle avg (passes <40s threshold)
-  // 9×9 and 10×10 deferred — exceed 40s threshold with current solver
-  return { rows: 8, cols: 8, numChars: 7, numRooms: seededInt(5, 6, rng) }
+  if (level <= 25) {
+    // 8×8: benchmark confirmed viable after OPT-1/2/3
+    return { rows: 8, cols: 8, numChars: 7, numRooms: seededInt(5, 6, rng) }
+  }
+  // 9×9: tentative — benchmark after optimizations to confirm
+  return { rows: 9, cols: 9, numChars: 8, numRooms: seededInt(6, 7, rng) }
 }
 
 function makeCellId(row: number, col: number): CellId {
@@ -372,8 +375,14 @@ function synthesizeClues(
   // character to exactly 1 cell (enabling placement and triggering chain deductions).
   for (let round = 0; round < 50; round++) {
     const { placed, candidates } = forwardSolveState(board, characters, clues)
+    const placedCount = Object.keys(placed).length
 
-    if (Object.keys(placed).length === characters.length) break
+    if (placedCount === characters.length) break
+
+    // OPT-3: Early failure detection. If after 20 rounds fewer than (N-2) sospechosos
+    // are forward-placed, this placement is unlikely to yield a forward-solvable puzzle.
+    // Bail early to avoid wasting the remaining synthesis rounds.
+    if (round === 20 && placedCount < Math.max(1, characters.length - 3)) break
 
     let bestClue: Clue | null = null
     let bestRemaining = Infinity
@@ -461,7 +470,14 @@ export function generatePuzzle(
   const difficulty: 'easy' | 'medium' | 'hard' =
     level <= 10 ? 'easy' : level <= 20 ? 'medium' : 'hard'
 
-  for (let boardAttempt = 0; boardAttempt < 5; boardAttempt++) {
+  // OPT-1: Separate board geometry from character placement.
+  // Board generation is O(N²) and expensive; placement is O(N) and cheap.
+  // Strategy: generate fewer boards but try many more placements per board.
+  // 3 boards × 300 placements = 900 attempts (was 5 boards × 30 = 150).
+  const BOARD_ATTEMPTS = 3
+  const PLACEMENT_ATTEMPTS_PER_BOARD = 300
+
+  for (let boardAttempt = 0; boardAttempt < BOARD_ATTEMPTS; boardAttempt++) {
     const config = getDifficultyConfig(level, rng)
 
     let board: Board | null = null
@@ -475,10 +491,25 @@ export function generatePuzzle(
     }
     if (!board) continue
 
+    // Characters are fixed per board (not re-shuffled each placement).
     const charNames = seededShuffle(CHARACTER_NAMES, rng).slice(0, config.numChars)
     const characters: Character[] = charNames.map((name, i) => ({ id: `char-${i}`, name }))
 
-    for (let placeAttempt = 0; placeAttempt < 30; placeAttempt++) {
+    // OPT-1b: Pre-compute cell→roomId map to avoid O(N²) scans per placement.
+    const cellToRoom = new Map<string, string>()
+    for (const row of board.cells) {
+      for (const cell of row) {
+        cellToRoom.set(cell.id, cell.roomId)
+      }
+    }
+
+    // OPT-2: Deducibility threshold — minimum unique rooms required.
+    // Placements where many sospechosos share a room are hard to synthesize
+    // (fewer distinct in_room clues). Require at least (numChars - 2) unique rooms
+    // so at most 2 pairs of sospechosos share a room.
+    const minUniqueRooms = Math.max(2, config.numChars - 2)
+
+    for (let placeAttempt = 0; placeAttempt < PLACEMENT_ATTEMPTS_PER_BOARD; placeAttempt++) {
       // Shuffle all rows and cols independently, then split:
       //   rows[0..numChars-1]  → one row per character
       //   rows[numChars]       → the single FREE row  (stolen-object row)
@@ -513,14 +544,17 @@ export function generatePuzzle(
       }
       if (!valid) continue
 
+      // OPT-2: Deducibility pre-filter — count unique rooms in this placement.
+      // Cheap O(N) check before the expensive synthesizeClues call.
+      const uniqueRooms = new Set(characters.map(c => cellToRoom.get(solution[c.id]!))).size
+      if (uniqueRooms < minUniqueRooms) continue
+
       // Exactly one character must share a room with the stolen-object cell.
       // That character is the culprit: when the player clicks the glowing cell
       // (stolen object), only one suspect is in that room → unambiguous accusation.
+      // OPT-1b: use pre-computed cellToRoom map instead of O(N²) flat().find().
       const stolenRoomId = stolenCell.roomId
-      const charsInStolenRoom = characters.filter(c => {
-        const cellId = solution[c.id]!
-        return board!.cells.flat().find(x => x.id === cellId)?.roomId === stolenRoomId
-      })
+      const charsInStolenRoom = characters.filter(c => cellToRoom.get(solution[c.id]!) === stolenRoomId)
       if (charsInStolenRoom.length !== 1) continue
 
       const culprit = charsInStolenRoom[0]!

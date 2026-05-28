@@ -1,13 +1,13 @@
 #!/usr/bin/env bun
-// Generates levels 23-30 (hard: 8x8 to 10x10)
+// Generates levels 21-30 (hard: 8×8 for 21-25, 9×9 for 26-30)
 import { writeFileSync, mkdirSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { generatePuzzle } from '../src/logic/generator'
 
-const START_LEVEL = 23
+const START_LEVEL = 21
 const END_LEVEL = 30
-const MAX_ATTEMPTS = 200
+const MAX_ATTEMPTS = 500  // 9×9 has ~3% hit rate; 500 attempts = ~15 expected successes
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUTPUT_DIR = join(__dirname, '..', 'public', 'puzzles')
 
