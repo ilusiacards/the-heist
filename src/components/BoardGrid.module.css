@@ -71,9 +71,12 @@
 }
 
 .objectIcon {
-  font-size: clamp(12px, 2.5vw, 20px);
-  opacity: 0.6;
+  width: clamp(14px, 2.8vw, 22px);
+  height: clamp(14px, 2.8vw, 22px);
+  opacity: 0.85;
   pointer-events: none;
+  display: block;
+  flex-shrink: 0;
 }
 
 .charToken {
