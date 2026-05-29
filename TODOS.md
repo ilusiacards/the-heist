@@ -60,6 +60,23 @@
 
 ---
 
+## TODO-6: 11×11 tableros (10 personajes) — síntesis mejorada
+
+**What:** Los tableros 11×11 requieren sintetizar pistas que resuelvan 10 personajes por deducción pura. La tasa de éxito actual es < 0.1% (synthesis no converge en la mayoría de intentos).
+
+**Why:** El juego tiene `getDifficultyConfig` configurado para 11×11 en levels 38+, pero los JSON no existen porque la generación no funciona.
+
+**Options:**
+1. Agregar tipos de pistas más restrictivos (e.g. "X está en la habitación más grande", "fila/columna específica")
+2. Cambiar la estrategia de síntesis: en vez de síntesis greedy, usar backtracking en la selección de pistas
+3. Relajar el requisito de forward-solvability para niveles extremos (permitir 1 paso de suposición guiada)
+
+**Context:** El código en `generator.ts` ya soporta 11×11 vía `getDifficultyConfig`. Solo falta que `synthesizeClues` converja. El AC-3 incremental (`buildInitialState`/`applyClueToState`, ya implementado y exportado) es la base para una síntesis más agresiva.
+
+**Depends on:** v0.4.0 shipped (10×10 funciona), investigación adicional del algoritmo
+
+---
+
 ## TODO-5: MRV watchdog + arc-consistency for solver (v2)
 
 **What:** Add a watchdog to the backtracking solver: if backtrack depth exceeds `N * 3`, log a warning. Optionally, implement arc-consistency propagation after each `propagate()` call to prune relational clue candidates.
