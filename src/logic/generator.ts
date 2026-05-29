@@ -180,6 +180,9 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
     }
   }
 
+  // Upgrade some cama/alfombra objects to 2-cell spans
+  applySpanUpgrades(cells, rows, cols, rng)
+
   // Populate room.cells
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
@@ -190,6 +193,34 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
   }
 
   return { rows, cols, cells, rooms }
+}
+
+const SPAN_PROB: Record<number, number> = { 5: 0, 6: 0.20, 7: 0.35, 8: 0.50, 9: 0.60 }
+
+function applySpanUpgrades(cells: Cell[][], rows: number, cols: number, rng: () => number): void {
+  const prob = SPAN_PROB[rows] ?? 0
+  if (prob === 0) return
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = cells[r]![c]!
+      if (cell.object !== 'cama' && cell.object !== 'alfombra') continue
+      if (cell.objectPartOf) continue // already a secondary cell
+      if (rng() > prob) continue
+      const dirs: Array<[number, number, 'h' | 'v']> = []
+      if (c + 1 < cols) dirs.push([r, c + 1, 'h'])
+      if (r + 1 < rows) dirs.push([r + 1, c, 'v'])
+      if (dirs.length === 2 && rng() < 0.5) dirs.reverse()
+      for (const [nr, nc, dir] of dirs) {
+        const neighbor = cells[nr]![nc]!
+        if (neighbor.object !== undefined) continue
+        if (neighbor.roomId !== cell.roomId) continue
+        cell.objectSpanDir = dir
+        neighbor.object = cell.object
+        neighbor.objectPartOf = cell.id
+        break
+      }
+    }
+  }
 }
 
 // Unary clue types constrain only the subject character and enable solver pre-filtering.
@@ -533,6 +564,8 @@ export function generatePuzzle(
       // Stolen-object cell must be occupiable (player clicks it to accuse)
       const stolenCell = board.cells[freeRow]![freeCol]!
       if (!isOccupiable(stolenCell)) continue
+      // Stolen cell must not be part of any object span (keeps accusation mechanic simple)
+      if (stolenCell.objectPartOf || stolenCell.objectSpanDir) continue
 
       // Place all characters; each must also be on an occupiable cell
       const solution: Record<string, CellId> = {}

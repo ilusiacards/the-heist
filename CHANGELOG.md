@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0.0] - 2026-05-29
+
+### Added
+
+- **Objetos de 2 casillas (Banco y Alfombra)**: El Banco (`cama`) y la Alfombra (`alfombra`) ahora pueden aparecer en versión horizontal (2×1) o vertical (1×2) en tableros de 6×6 en adelante. La probabilidad de span escala con el tamaño del tablero (0% en 5×5 → 60% en 9×9). El SVG del objeto se renderiza desde la celda primaria y ocupa visualmente las 2 celdas.
+- **4 nuevos SVGs wide**: `cama_wide_h`, `cama_wide_v`, `alfombra_wide_h`, `alfombra_wide_v` con animación `animBancoMece` en el banco largo.
+- **Guard de celda secundaria**: Clic en la celda secundaria de un span redirige a la celda primaria — sin comportamiento roto para el jugador.
+
+### Changed
+
+- **Modelo de datos Cell**: 2 campos opcionales nuevos: `objectSpanDir?: 'h' | 'v'` (celda primaria) y `objectPartOf?: CellId` (celda secundaria).
+- **`isOccupiable`**: Las celdas secundarias de un span son `false` — el solver y el generador las excluyen de posiciones válidas de personajes.
+- **`generateBoard`**: Llama a `applySpanUpgrades()` después del bucle de garantía de ocupabilidad. La celda del objeto robado nunca forma parte de un span.
+- **`BoardGrid`**: `gridWrapper` envuelve la grilla para permitir que los SVGs wide desborden la celda sin ser cortados por `overflow: hidden`.
+- **Tests**: 11 nuevos tests en `src/test/multiCellObjects.test.ts` cubriendo span placement, clue evaluation, stolen-cell guard y fuzz test de unicidad.
+
 ## [0.1.5.0] - 2026-05-27
 
 ### Changed

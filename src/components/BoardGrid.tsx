@@ -60,8 +60,11 @@ export function BoardGrid({
     const parts = [styles.cell]
     const isEliminated = eliminatedRows.has(cell.row) || eliminatedCols.has(cell.col)
     if (isEliminated) parts.push(styles.eliminated!)
-    if (!isOccupiable(cell)) parts.push(styles.nonOccupiable!)
+    // Secondary span cells are non-occupiable but styled as part of the object, not as blocked cells
+    if (!isOccupiable(cell) && !cell.objectPartOf) parts.push(styles.nonOccupiable!)
     if (cell.id === glowingCellId) parts.push(styles.glowing!)
+    if (cell.objectSpanDir) parts.push(styles.spanPrimary!)
+    if (cell.objectPartOf) parts.push(styles.spanSecondary!)
     return parts.filter(Boolean).join(' ')
   }
 
@@ -78,6 +81,7 @@ export function BoardGrid({
   }
 
   return (
+    <div className={styles.gridWrapper}>
     <div
       className={styles.grid}
       style={{
@@ -100,7 +104,14 @@ export function BoardGrid({
             key={cell.id}
             className={cellClasses(cell)}
             style={borderStyle}
-            onClick={() => onCellClick(cell)}
+            onClick={() => {
+              // Secondary span cells redirect to their primary cell
+              if (cell.objectPartOf) {
+                const primary = board.cells.flat().find(c => c.id === cell.objectPartOf)
+                if (primary) { onCellClick(primary); return }
+              }
+              onCellClick(cell)
+            }}
             aria-label={`Celda fila ${cell.row + 1} columna ${cell.col + 1}${placedChar ? `, ${placedChar.name}` : ''}${isElim ? ', eliminada' : ''}`}
             role="gridcell"
             aria-selected={!!placedChar}
@@ -121,9 +132,18 @@ export function BoardGrid({
               </span>
             ))}
 
-            {/* Object icon */}
-            {cell.object && (
-              <span className={styles.objectIcon} aria-hidden="true"><ObjectIcon obj={cell.object} /></span>
+            {/* Object icon — skip secondary span cells (primary's SVG covers them) */}
+            {cell.object && !cell.objectPartOf && (
+              <span
+                className={cell.objectSpanDir === 'h'
+                  ? styles.objectIconWide_h
+                  : cell.objectSpanDir === 'v'
+                    ? styles.objectIconWide_v
+                    : styles.objectIcon}
+                aria-hidden="true"
+              >
+                <ObjectIcon obj={cell.object} spanDir={cell.objectSpanDir} />
+              </span>
             )}
 
             {/* Character token */}
@@ -144,6 +164,7 @@ export function BoardGrid({
           </button>
         )
       })}
+    </div>
     </div>
   )
 }
