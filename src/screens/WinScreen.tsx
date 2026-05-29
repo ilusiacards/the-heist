@@ -20,7 +20,7 @@ export function WinScreen({ puzzle, culpritId, onNext, onLevelSelect }: Props) {
     saveProgress(puzzle.level)
   }, [puzzle.level])
 
-  const hasNextLevel = puzzle.level < 30
+  const hasNextLevel = puzzle.level < 37
 
   return (
     <div className={styles.screen}>

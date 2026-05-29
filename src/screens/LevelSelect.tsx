@@ -1,10 +1,11 @@
 import { loadProgress } from '../logic/storage'
 import styles from './LevelSelect.module.css'
 
-const TOTAL_LEVELS = 30
+const TOTAL_LEVELS = 37
 const DIFFICULTY_LABELS = ['Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil',
   'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio',
-  'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil']
+  'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil',
+  'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo']
 
 interface Props {
   onSelectLevel: (level: number) => void
