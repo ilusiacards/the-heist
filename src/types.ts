@@ -8,6 +8,7 @@ export type ObjectType =
   | 'mesa' | 'tv' | 'planta' | 'estanteria' | 'caja'
 
 export function isOccupiable(cell: Cell): boolean {
+  if (cell.objectPartOf) return false  // secondary span cells are visual-only, not valid placements
   return cell.object === undefined || OCCUPIABLE_OBJECTS.includes(cell.object as OccupiableObject)
 }
 
@@ -20,6 +21,8 @@ export interface Cell {
   roomId: string
   object?: ObjectType
   windows: WallSide[]
+  objectSpanDir?: 'h' | 'v'   // primary cell of a 2-cell span: spans right ('h') or down ('v')
+  objectPartOf?: CellId        // secondary cell: points to the primary cell's id
 }
 
 export interface Room {
