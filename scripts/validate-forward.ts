@@ -83,8 +83,13 @@ function forwardSolve(
   }
 }
 
+// Count available level files
+import { existsSync } from 'fs'
+let maxLevel = 30
+while (existsSync(join(PUZZLE_DIR, `level-${maxLevel + 1}.json`))) maxLevel++
+
 let allSolved = true
-for (let i = 1; i <= 30; i++) {
+for (let i = 1; i <= maxLevel; i++) {
   const puzzle = JSON.parse(readFileSync(join(PUZZLE_DIR, `level-${i}.json`), 'utf8'))
   const { placed, candidates } = forwardSolve(puzzle.board, puzzle.characters, puzzle.clues)
   const placedCount = Object.keys(placed).length
@@ -118,5 +123,5 @@ for (let i = 1; i <= 30; i++) {
   console.log(`Level ${String(i).padStart(2)}: ${label}${diff}`)
 }
 
-console.log(allSolved ? '\nAll 30 levels forward-solvable!' : '\nSome levels are NOT forward-solvable.')
+console.log(allSolved ? `\nAll ${maxLevel} levels forward-solvable!` : '\nSome levels are NOT forward-solvable.')
 process.exit(allSolved ? 0 : 1)
