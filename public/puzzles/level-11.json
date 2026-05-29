@@ -297,6 +297,7 @@
       {
         "id": "room-0",
         "name": "Dormitorio",
+        "articleName": "el dormitorio",
         "cells": [
           "F2C0",
           "F2C1",
@@ -310,6 +311,7 @@
       {
         "id": "room-1",
         "name": "Cocina",
+        "articleName": "la cocina",
         "cells": [
           "F3C0",
           "F4C0",
@@ -319,6 +321,7 @@
       {
         "id": "room-2",
         "name": "Sala",
+        "articleName": "la sala",
         "cells": [
           "F0C5",
           "F1C5",
@@ -334,6 +337,7 @@
       {
         "id": "room-3",
         "name": "Baño",
+        "articleName": "el baño",
         "cells": [
           "F3C1",
           "F4C1",
@@ -347,6 +351,7 @@
       {
         "id": "room-4",
         "name": "Biblioteca",
+        "articleName": "la biblioteca",
         "cells": [
           "F0C0",
           "F0C1",
@@ -369,11 +374,11 @@
     },
     {
       "id": "char-1",
-      "name": "Bruno"
+      "name": "Marco"
     },
     {
       "id": "char-2",
-      "name": "Nadia"
+      "name": "Karel"
     },
     {
       "id": "char-3",
@@ -381,72 +386,70 @@
     },
     {
       "id": "char-4",
-      "name": "Ana"
+      "name": "Celia"
     }
   ],
   "clues": [
     {
-      "id": "clue-2",
-      "type": "on_object",
-      "subject": "char-0",
-      "params": {
-        "objectType": "alfombra"
-      }
-    },
-    {
-      "id": "clue-142",
+      "id": "clue-34",
       "type": "in_room",
-      "subject": "char-0",
+      "subject": "char-3",
       "params": {
-        "roomId": "room-3"
+        "roomId": "room-1"
       }
     },
     {
-      "id": "clue-208",
-      "type": "on_object",
-      "subject": "char-2",
-      "params": {
-        "objectType": "alfombra"
-      }
+      "id": "clue-113",
+      "type": "in_corner",
+      "subject": "char-3",
+      "params": {}
     },
     {
-      "id": "clue-222",
+      "id": "clue-158",
+      "type": "next_to_window",
+      "subject": "char-4",
+      "params": {}
+    },
+    {
+      "id": "clue-220",
       "type": "in_room",
       "subject": "char-4",
       "params": {
-        "roomId": "room-3"
+        "roomId": "room-4"
       }
     },
     {
-      "id": "clue-268",
+      "id": "clue-321",
+      "type": "next_to_window",
+      "subject": "char-0",
+      "params": {}
+    },
+    {
+      "id": "clue-334",
       "type": "in_room",
+      "subject": "char-2",
+      "params": {
+        "roomId": "room-2"
+      }
+    },
+    {
+      "id": "clue-370",
+      "type": "on_object",
       "subject": "char-1",
       "params": {
-        "roomId": "room-0"
+        "objectType": "alfombra"
       }
-    },
-    {
-      "id": "clue-300",
-      "type": "next_to_window",
-      "subject": "char-3",
-      "params": {}
-    },
-    {
-      "id": "clue-329",
-      "type": "not_in_corner",
-      "subject": "char-3",
-      "params": {}
     }
   ],
   "solution": {
     "placement": {
-      "char-0": "F4C2",
-      "char-1": "F2C3",
-      "char-2": "F5C5",
-      "char-3": "F1C0",
-      "char-4": "F3C1"
+      "char-0": "F4C5",
+      "char-1": "F2C2",
+      "char-2": "F3C4",
+      "char-3": "F5C0",
+      "char-4": "F1C1"
     },
-    "culpritId": "char-3",
-    "stolenObjectCellId": "F0C4"
+    "culpritId": "char-4",
+    "stolenObjectCellId": "F0C3"
   }
 }

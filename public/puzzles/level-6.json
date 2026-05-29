@@ -208,6 +208,7 @@
       {
         "id": "room-0",
         "name": "Dormitorio",
+        "articleName": "el dormitorio",
         "cells": [
           "F1C0",
           "F1C1",
@@ -226,6 +227,7 @@
       {
         "id": "room-1",
         "name": "Cocina",
+        "articleName": "la cocina",
         "cells": [
           "F0C0",
           "F0C1",
@@ -240,6 +242,7 @@
       {
         "id": "room-2",
         "name": "Sala",
+        "articleName": "la sala",
         "cells": [
           "F3C3",
           "F3C4",

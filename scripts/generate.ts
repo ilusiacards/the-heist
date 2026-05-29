@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 import { generatePuzzle } from '../src/logic/generator'
 
 const TOTAL_LEVELS = 30
-const MAX_ATTEMPTS = 100
+const MAX_ATTEMPTS = 500
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUTPUT_DIR = join(__dirname, '..', 'public', 'puzzles')
 
