@@ -1,10 +1,10 @@
 import styles from './SolutionsScreen.module.css'
 
-const TOTAL_LEVELS = 37
+const TOTAL_LEVELS = 38
 const DIFFICULTY_LABELS = ['Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil', 'Fácil',
   'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio', 'Medio',
   'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil', 'Difícil',
-  'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo']
+  'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo', 'Extremo']
 
 interface Props {
   onSelectLevel: (level: number) => void

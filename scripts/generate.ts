@@ -4,9 +4,10 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { generatePuzzle } from '../src/logic/generator'
 
-const TOTAL_LEVELS = 37        // levels 31-37 are 10×10; 11×11 deferred (requires algorithm improvements)
+const TOTAL_LEVELS = 38        // level 38 = first 11×11 (10 personajes)
 const MAX_ATTEMPTS_SMALL = 500  // levels 1-30 (up to 9×9)
-const MAX_ATTEMPTS_LARGE = 1000 // levels 31+ (10×10) need more attempts due to lower success rate
+const MAX_ATTEMPTS_LARGE = 1000  // levels 31-37 (10×10)
+const MAX_ATTEMPTS_11X11 = 5000  // levels 38+ (11×11): ~0.06% success rate, needs ~1600 attempts avg
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUTPUT_DIR = join(__dirname, '..', 'public', 'puzzles')
 
@@ -15,7 +16,7 @@ mkdirSync(OUTPUT_DIR, { recursive: true })
 let failures = 0
 
 for (let level = 1; level <= TOTAL_LEVELS; level++) {
-  const maxAttempts = level >= 31 ? MAX_ATTEMPTS_LARGE : MAX_ATTEMPTS_SMALL
+  const maxAttempts = level >= 38 ? MAX_ATTEMPTS_11X11 : level >= 31 ? MAX_ATTEMPTS_LARGE : MAX_ATTEMPTS_SMALL
   let generated = false
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const seed = level * 1000 + attempt
@@ -43,6 +44,6 @@ if (failures > 0) {
 }
 
 console.log(`[generate] Done — ${TOTAL_LEVELS} puzzles written to ${OUTPUT_DIR}`)
-// Note: levels 38+ (11×11, 10 characters) are deferred. The forward-solvable synthesis
-// algorithm needs improvements (better clue types or smarter strategy) to reliably
-// generate 10-character puzzles. Track in TODOS.md TODO-5.
+// Note: 11×11 generation (levels 38+) requires ~1600 attempts avg (~0.06% success rate).
+// With MAX_ATTEMPTS_11X11=5000, each level takes ~50 min. Generate only when needed.
+// Seed 39606 = level-38.json (found after 1606 attempts, 16 min).
