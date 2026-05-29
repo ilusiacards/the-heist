@@ -1,6 +1,93 @@
 import styles from './ObjectIcon.module.css'
 
-export function ObjectIcon({ obj }: { obj: string }) {
+export function ObjectIcon({ obj, spanDir }: { obj: string; spanDir?: 'h' | 'v' }) {
+  // Wide (2-cell) variants for cama and alfombra
+  if (spanDir === 'h') {
+    if (obj === 'cama') return (
+      <svg viewBox="0 0 48 24" fill="none" width="100%" height="100%" className={styles.animBancoMece}>
+        <line x1="5" y1="2" x2="5" y2="11" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="43" y1="2" x2="43" y2="11" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round"/>
+        <rect x="3.5" y="1.5" width="41" height="2.5" rx="1" fill="#92400e" stroke="#3d1a00" strokeWidth="0.8"/>
+        <rect x="2" y="10.5" width="44" height="3.5" rx="1.5" fill="#d97706" stroke="#92400e" strokeWidth="1.2"/>
+        <rect x="5" y="18" width="38" height="1.5" rx="0.5" fill="#b45309"/>
+        <line x1="4.5" y1="14" x2="4.5" y2="22" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="14.5" y1="14" x2="14.5" y2="22" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="24" y1="14" x2="24" y2="22" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="33.5" y1="14" x2="33.5" y2="22" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="43.5" y1="14" x2="43.5" y2="22" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    )
+    if (obj === 'alfombra') return (
+      <svg viewBox="0 0 48 24" fill="none" width="100%" height="100%">
+        {/* Left fringes only */}
+        <line x1="6" y1="4" x2="6" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="10" y1="4" x2="10" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="14" y1="4" x2="14" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="4" x2="18" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        {/* Right fringes only — seamless center */}
+        <line x1="30" y1="4" x2="30" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="34" y1="4" x2="34" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="38" y1="4" x2="38" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="42" y1="4" x2="42" y2="7" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <rect x="2" y="7" width="44" height="11" rx="1" fill="#d97706" stroke="#92400e" strokeWidth="1.2"/>
+        <rect x="4" y="9" width="40" height="7" rx=".5" stroke="#fde68a" strokeWidth="1.5" fill="none"/>
+        <ellipse cx="24" cy="12.5" rx="6" ry="2.5" fill="#b45309" stroke="#fde68a" strokeWidth="1.2" className={styles.animMedallion}/>
+        {/* Bottom left fringes */}
+        <line x1="6" y1="18" x2="6" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="10" y1="18" x2="10" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="14" y1="18" x2="14" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="18" x2="18" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        {/* Bottom right fringes */}
+        <line x1="30" y1="18" x2="30" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="34" y1="18" x2="34" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="38" y1="18" x2="38" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="42" y1="18" x2="42" y2="21" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+      </svg>
+    )
+  }
+  if (spanDir === 'v') {
+    if (obj === 'cama') return (
+      <svg viewBox="0 0 24 48" fill="none" width="100%" height="100%" className={styles.animBancoMece}>
+        <line x1="5" y1="2" x2="5" y2="24" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="19" y1="2" x2="19" y2="24" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round"/>
+        <rect x="3.5" y="1.5" width="17" height="2.5" rx="1" fill="#92400e" stroke="#3d1a00" strokeWidth="0.8"/>
+        <rect x="2" y="23" width="20" height="3.5" rx="1.5" fill="#d97706" stroke="#92400e" strokeWidth="1.2"/>
+        <rect x="5" y="30" width="14" height="1.5" rx="0.5" fill="#b45309"/>
+        <line x1="4.5" y1="26.5" x2="4.5" y2="46" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="9.5" y1="26.5" x2="9.5" y2="46" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="14.5" y1="26.5" x2="14.5" y2="46" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="19.5" y1="26.5" x2="19.5" y2="46" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    )
+    if (obj === 'alfombra') return (
+      <svg viewBox="0 0 24 48" fill="none" width="100%" height="100%">
+        {/* Top fringes only */}
+        <line x1="4" y1="6" x2="7" y2="6" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="4" y1="10" x2="7" y2="10" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="4" y1="14" x2="7" y2="14" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="4" y1="18" x2="7" y2="18" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        {/* Bottom fringes only — seamless center */}
+        <line x1="4" y1="30" x2="7" y2="30" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="4" y1="34" x2="7" y2="34" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="4" y1="38" x2="7" y2="38" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="4" y1="42" x2="7" y2="42" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <rect x="7" y="2" width="11" height="44" rx="1" fill="#d97706" stroke="#92400e" strokeWidth="1.2"/>
+        <rect x="9" y="4" width="7" height="40" rx=".5" stroke="#fde68a" strokeWidth="1.5" fill="none"/>
+        <ellipse cx="12.5" cy="24" rx="2.5" ry="6" fill="#b45309" stroke="#fde68a" strokeWidth="1.2" className={styles.animMedallion}/>
+        {/* Right top fringes */}
+        <line x1="18" y1="6" x2="21" y2="6" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="10" x2="21" y2="10" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="14" x2="21" y2="14" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="18" x2="21" y2="18" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        {/* Right bottom fringes */}
+        <line x1="18" y1="30" x2="21" y2="30" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="34" x2="21" y2="34" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="38" x2="21" y2="38" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="18" y1="42" x2="21" y2="42" stroke="#78350f" strokeWidth="2.5" strokeLinecap="round"/>
+      </svg>
+    )
+  }
+
   const icons: Record<string, JSX.Element> = {
     silla: (
       <svg viewBox="0 0 24 24" fill="none" width="100%" height="100%" className={styles.animSilla}>
