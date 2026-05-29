@@ -1,11 +1,19 @@
+/* Outer wrapper: clips to border-radius and holds the border */
+.gridWrapper {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  width: 100%;
+  aspect-ratio: 1;
+}
+
 .grid {
   display: grid;
   gap: 0;
   width: 100%;
-  aspect-ratio: 1;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+  height: 100%;
+  /* overflow: visible so 2-cell span SVGs can extend beyond cell bounds */
+  overflow: visible;
 }
 
 .cell {
@@ -142,5 +150,44 @@
   right: 1px;
   top: 50%;
   transform: translateY(-50%) rotate(90deg);
+}
+
+/* 2-cell span: primary cell must override .cell's overflow:hidden */
+.cell.spanPrimary {
+  overflow: visible !important;
+  z-index: 1;
+}
+
+/* 2-cell span: subtle background tint on secondary cell so the span reads as a unit */
+.cell.spanSecondary {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Wide object icon — horizontal span: extends right into secondary cell */
+.objectIconWide_h {
+  position: absolute;
+  width: calc(200% + 1px);
+  height: 75%;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.85;
+  line-height: 0;
+}
+
+/* Wide object icon — vertical span: extends down into secondary cell */
+.objectIconWide_v {
+  position: absolute;
+  width: 75%;
+  height: calc(200% + 1px);
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.85;
+  line-height: 0;
 }
 
