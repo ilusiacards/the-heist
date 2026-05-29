@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { Board, Cell, CellId } from '../types'
+import type { Board, Cell, CellId, ObjectType } from '../types'
 import { evaluateClue } from '../logic/evaluateClue'
 import { generatePuzzle } from '../logic/generator'
 import { findAllSolutions } from '../logic/solver'
@@ -50,7 +50,7 @@ describe('multi-cell objects — clue evaluation', () => {
       id: 'c1',
       type: 'on_object' as const,
       subject: 'char-0',
-      params: { objectType: 'alfombra' },
+      params: { objectType: 'alfombra' as ObjectType },
     }
     const placement = { 'char-0': 'F1C1' as CellId }
     expect(evaluateClue(clue, placement, board, 'full')).toBe(true)
@@ -65,7 +65,7 @@ describe('multi-cell objects — clue evaluation', () => {
       id: 'c1',
       type: 'on_object' as const,
       subject: 'char-0',
-      params: { objectType: 'alfombra' },
+      params: { objectType: 'alfombra' as ObjectType },
     }
     const placement = { 'char-0': 'F1C0' as CellId }
     expect(evaluateClue(clue, placement, board, 'full')).toBe(true)
@@ -80,7 +80,7 @@ describe('multi-cell objects — clue evaluation', () => {
       id: 'c1',
       type: 'not_on_object' as const,
       subject: 'char-0',
-      params: { objectType: 'alfombra' },
+      params: { objectType: 'alfombra' as ObjectType },
     }
     const placement = { 'char-0': 'F0C0' as CellId }
     expect(evaluateClue(clue, placement, board, 'full')).toBe(true)
