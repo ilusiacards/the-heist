@@ -60,20 +60,72 @@
 
 ---
 
-## TODO-6: 11×11 tableros (10 personajes) — síntesis mejorada
+## TODO-6: 11×11 síntesis más rápida — nuevos clue types + relajar forward-solvability
 
-**What:** Los tableros 11×11 requieren sintetizar pistas que resuelvan 10 personajes por deducción pura. La tasa de éxito actual es < 0.1% (synthesis no converge en la mayoría de intentos).
+**Estado actual (v0.4.1.0):**
+- Level 38 existe y es válido (seed 39606, 16 clues, forward-solvable ✓)
+- Tasa de éxito: ~0.06% (1 en 1600 intentos), ~16 min offline por nivel
+- Levels 39-45 (11×11) pendientes de generar; tardarían ~50 min/nivel con MAX_ATTEMPTS=5000
+- Bloqueante para generación rápida: solo 6 tipos de clue unarios disponibles (el invariante
+  Latin square elimina todos los clues relacionales que necesitan misma fila o columna)
 
-**Why:** El juego tiene `getDifficultyConfig` configurado para 11×11 en levels 38+, pero los JSON no existen porque la generación no funciona.
+**Causa raíz confirmada:**
+El invariante Latin square (cada personaje en fila Y columna únicas) hace imposibles:
+`direction_of`, `next_to`, `n_cols_direction_of`, `n_rows_direction_of` (todos necesitan
+colDiff=0 o rowDiff=0). Solo quedan 6 clues unarios: in_room, on_object, in_corner,
+not_in_corner, next_to_window, not_next_to_window.
+Con habitaciones de ~14 celdas en 11×11, in_room deja ~15% de candidatos — muy poco restrictivo.
 
-**Options:**
-1. Agregar tipos de pistas más restrictivos (e.g. "X está en la habitación más grande", "fila/columna específica")
-2. Cambiar la estrategia de síntesis: en vez de síntesis greedy, usar backtracking en la selección de pistas
-3. Relajar el requisito de forward-solvability para niveles extremos (permitir 1 paso de suposición guiada)
+**Líneas de ataque para la próxima sesión:**
 
-**Context:** El código en `generator.ts` ya soporta 11×11 vía `getDifficultyConfig`. Solo falta que `synthesizeClues` converja. El AC-3 incremental (`buildInitialState`/`applyClueToState`, ya implementado y exportado) es la base para una síntesis más agresiva.
+### Opción A: Nuevos tipos de clue compatibles con Latin square (ALTA prioridad)
+Clues que NO requieren misma fila/columna entre chars:
+- **`in_row(X, N)`** — "X está en la fila N del tablero". Unario puro, elimina 10/11 filas.
+  Con 11 filas y ~7 ocupiables por fila, deja ~7/80 = 9% de candidatos. Más restrictivo que in_room.
+  Implementación: en `evaluateClue.ts` case `in_row`, en `candidateClues` emitir si rowDiff=0 (nunca)...
+  Espera — in_row sería unario (no relacional), así que sí funciona.
+  Nombre sugerido: `in_row` / `in_col` (referencia la posición del tablero, no de otro personaje)
+- **`same_row_as(X, stolenObject)`** — X comparte fila con la celda robada. Es unario en esencia
+  (la celda robada es fija por el puzzle). Deja exactamente las celdas ocupiables de esa fila.
+  Muy restrictivo + tiene sentido narrativo ("el ladrón estaba en la misma fila que el objeto robado")
+- **`same_room_as(X, stolenObject_room)`** — ya existe como in_room pero referenciando
+  explícitamente la habitación del culpable. Útil para desambiguar.
 
-**Depends on:** v0.4.0 shipped (10×10 funciona), investigación adicional del algoritmo
+### Opción B: Relajar forward-solvability (BAJA complejidad, ALTA ganancia)
+Cambio: aceptar puzzles donde N-1 chars son forward-placed y el Nth es automático por row/col.
+Estado actual: `forwardSolveState` YA hace esto vía `propagateRowCol()` — si 9/10 chars
+están placed, el 10º queda en la única celda (free_row, free_col) por eliminación.
+El check actual `forwardMatchesSolution = characters.every(c => finalPlaced[c.id] === solution[c.id])`
+requiere que forwardSolveState los place TODOS. Si 9/10 se colocan por deducción y el 10º
+por eliminación, forwardSolveState igual los coloca todos → forwardMatchesSolution = TRUE.
+**CONCLUSIÓN: ya está implementado implícitamente.** El bottleneck es llegar a 9/10 placed.
+
+### Opción C: Síntesis de tablero más favorable (MEDIA complejidad)
+Para 11×11 con 9 habitaciones (seededInt(8,9)), las habitaciones tienen ~14 celdas avg.
+Si reducimos a 11-12 habitaciones (más salas pequeñas), in_room dejaría ~7 celdas por sala
+en vez de ~14 → in_room twice as restrictive → success rate mejora ~4×.
+Cambio: `getDifficultyConfig` para level 38+: `numRooms: seededInt(10, 11, rng)`
+
+### Opción D: Board generation bias (ALTA complejidad, ALTA ganancia)
+Generar boards que maximizan la "distinguibilidad" de celdas:
+- Maximizar variedad de objetos (más silla, cama, alfombra por habitación)
+- Distribuir objetos de esquina y ventana para que más personajes sean únicos por combinación
+- Pre-filtrar placements donde ≥3 personajes no tienen celda única con clues actuales
+
+**Archivos clave a conocer antes de la próxima sesión:**
+- `src/logic/generator.ts` líneas 533-640: `synthesizeClues`, la función a modificar
+- `src/logic/evaluateClue.ts`: donde agregar nuevos tipos de clue
+- `src/types.ts`: donde declarar ClueType nuevos
+- Seed de referencia: `generatePuzzle(39606, 38)` = un 11×11 válido confirmado (16 clues)
+- Tasa baseline post-v0.4.1: 0.06% para 11×11, 0.5% para 10×10, 1% para 9×9
+
+**Orden de implementación recomendado:**
+1. Opción C (más habitaciones para 11×11) — 2 líneas, ganancia ~4×
+2. Opción A con `in_row`/`in_col` — ~50 líneas, ganancia estimada ~5-10×
+3. Benchmark de los cambios con `/bench 11x11`
+4. Si la tasa supera 1%: generar los 7 niveles restantes (39-45)
+
+**Depends on:** v0.4.1.0 shipped (level 38 existe, síntesis mejorada con OPT-3 relajado)
 
 ---
 
