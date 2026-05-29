@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0.0] - 2026-05-29
+
+### Added
+
+- **7 nuevos niveles 10×10 (niveles 31–37)**: El juego ahora tiene 37 niveles. Los niveles "Extremo" (31–37) usan tableros de 10×10 con 9 personajes — la sesión de deducción más larga del juego.
+- **Tableros 11×11 configurados (niveles 38+)**: El generador soporta 11×11 (10 personajes) y está listo para producir niveles en cuanto el algoritmo de síntesis lo permita — diferido al próximo ciclo de mejoras.
+- **`buildInitialState` + `applyClueToState` (AC-3 incremental)**: Funciones exportadas que implementan propagación de restricciones tipo AC-3 con worklist multi-hop. Base para síntesis incremental futura y para testing unitario del motor lógico.
+- **`SPAN_PROB` para tableros 10×11**: Los objetos de 2 casillas (Banco y Alfombra) ahora aparecen en tableros 10×10 (65% de probabilidad) y 11×11 (70%).
+
+### Changed
+
+- **`getDifficultyConfig`**: Niveles 31–37 → 10×10 (9 personajes), niveles 38+ → 11×11 (10 personajes). Los rangos existentes (5×5 a 9×9) no cambian.
+- **`getCell` en `synthesizeClues`**: Refactorizado de O(N²) scan a O(1) lookup via `cellById` Map precomputado — mejora la velocidad de síntesis en todos los tamaños.
+- **Scripts de generación**: `generate.ts` usa `MAX_ATTEMPTS=1000` para niveles 31+ (vs 500 para niveles anteriores). `validate-forward.ts` detecta automáticamente el número de niveles disponibles.
+- **`benchmark-sizes.ts`**: Actualizado con configs para 9×9, 10×10 y 11×11 usando seeds del mismo formato que el script de generación.
+- **Total de niveles**: 30 → 37 en `LevelSelect`, `SolutionsScreen` y `WinScreen`.
+- **Tests**: 4 nuevos tests en `generator.test.ts` cubriendo `applyClueToState` (happy path, contradicción, placement), validación de 10×10 y Latin square invariant.
+
 ## [0.3.0.0] - 2026-05-29
 
 ### Added
