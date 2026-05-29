@@ -67,8 +67,14 @@ function getDifficultyConfig(level: number, rng: () => number): BoardConfig {
     // 8×8: benchmark confirmed viable after OPT-1/2/3
     return { rows: 8, cols: 8, numChars: 7, numRooms: seededInt(5, 6, rng) }
   }
-  // 9×9: tentative — benchmark after optimizations to confirm
-  return { rows: 9, cols: 9, numChars: 8, numRooms: seededInt(6, 7, rng) }
+  if (level <= 30) {
+    return { rows: 9, cols: 9, numChars: 8, numRooms: seededInt(6, 7, rng) }
+  }
+  if (level <= 37) {
+    return { rows: 10, cols: 10, numChars: 9, numRooms: seededInt(7, 8, rng) }
+  }
+  // 11×11: extreme difficulty, levels 38+
+  return { rows: 11, cols: 11, numChars: 10, numRooms: seededInt(8, 9, rng) }
 }
 
 function makeCellId(row: number, col: number): CellId {
@@ -195,7 +201,7 @@ function generateBoard(config: BoardConfig, rng: () => number): Board {
   return { rows, cols, cells, rooms }
 }
 
-const SPAN_PROB: Record<number, number> = { 5: 0, 6: 0.20, 7: 0.35, 8: 0.50, 9: 0.60 }
+const SPAN_PROB: Record<number, number> = { 5: 0, 6: 0.20, 7: 0.35, 8: 0.50, 9: 0.60, 10: 0.65, 11: 0.70 }
 
 function applySpanUpgrades(cells: Cell[][], rows: number, cols: number, rng: () => number): void {
   const prob = SPAN_PROB[rows] ?? 0
@@ -228,6 +234,117 @@ function applySpanUpgrades(cells: Cell[][], rows: number, cols: number, rng: () 
 const UNARY_CLUE_TYPES = new Set<Clue['type']>([
   'in_room', 'on_object', 'in_corner', 'not_in_corner', 'next_to_window', 'not_next_to_window',
 ])
+
+// Incremental constraint propagation state for clue synthesis.
+// Avoids re-running forwardSolveState from scratch each synthesis round.
+export type SynthesisState = {
+  candidates: Map<string, Set<CellId>>
+  placed: Record<string, CellId>
+  usedRows: Set<number>
+  usedCols: Set<number>
+  contradiction: boolean
+}
+
+export function buildInitialState(board: Board, characters: Character[]): SynthesisState {
+  const occupiable = board.cells.flat().filter(c => isOccupiable(c)).map(c => c.id as CellId)
+  const candidates = new Map<string, Set<CellId>>()
+  for (const char of characters) {
+    candidates.set(char.id, new Set(occupiable))
+  }
+  return { candidates, placed: {}, usedRows: new Set(), usedCols: new Set(), contradiction: false }
+}
+
+// Apply a new clue to the synthesis state using an AC-3 worklist algorithm.
+// Exported for testing; not used in the synthesis loop (which uses forwardSolveState for accuracy).
+export function applyClueToState(
+  state: SynthesisState,
+  clue: Clue,
+  board: Board,
+  characters: Character[],
+  prevClues: Clue[],
+  cellById: Map<string, Cell>
+): SynthesisState {
+  // Reduce the subject's candidates based on the new clue.
+  // Use state.placed so relational clues (e.g. direction_of(B, A)) can filter correctly
+  // when the referenced character A is already placed.
+  if (!state.placed[clue.subject]) {
+    const subjectCands = state.candidates.get(clue.subject)!
+    for (const cellId of [...subjectCands]) {
+      if (evaluateClue(clue, { ...state.placed, [clue.subject]: cellId }, board, 'partial') === false) {
+        subjectCands.delete(cellId)
+      }
+    }
+    if (subjectCands.size === 0) return { ...state, contradiction: true }
+  }
+
+  const worklist = new Set<string>([clue.subject])
+
+  while (worklist.size > 0) {
+    const charId = worklist.values().next().value as string
+    worklist.delete(charId)
+
+    if (state.placed[charId]) continue
+
+    const cands = state.candidates.get(charId)!
+    const prevSize = cands.size
+
+    // Row/col exclusion based on currently placed characters
+    for (const cellId of [...cands]) {
+      const cell = cellById.get(cellId as string)!
+      if (state.usedRows.has(cell.row) || state.usedCols.has(cell.col)) {
+        cands.delete(cellId)
+      }
+    }
+
+    // Re-evaluate all previously accumulated clues where charId is the subject
+    for (const prevClue of prevClues) {
+      if (prevClue.subject !== charId) continue
+      for (const cellId of [...cands]) {
+        const result = evaluateClue(prevClue, { ...state.placed, [charId]: cellId }, board, 'partial')
+        if (result === false) cands.delete(cellId)
+      }
+    }
+
+    if (cands.size === 0) return { ...state, contradiction: true }
+
+    // Fix the character when exactly 1 candidate remains
+    if (cands.size === 1) {
+      const cellId = [...cands][0]! as CellId
+      state.placed[charId] = cellId
+      const cell = cellById.get(cellId as string)!
+      state.usedRows.add(cell.row)
+      state.usedCols.add(cell.col)
+
+      // Propagate row/col exclusion to all other unplaced characters
+      for (const other of characters) {
+        if (other.id === charId || state.placed[other.id]) continue
+        const otherCands = state.candidates.get(other.id)!
+        const otherBefore = otherCands.size
+        for (const cid of [...otherCands]) {
+          const c = cellById.get(cid as string)!
+          if (c.row === cell.row || c.col === cell.col) otherCands.delete(cid)
+        }
+        if (otherCands.size === 0) return { ...state, contradiction: true }
+        if (otherCands.size < otherBefore) worklist.add(other.id)
+      }
+    }
+
+    // Reverse arc propagation: if this character's domain shrank (or was placed),
+    // queue all unplaced characters whose relational clues reference charId as otherId.
+    // This handles cases like direction_of(X, Y) where Y's narrowed domain further constrains X.
+    const afterSize = state.placed[charId] !== undefined ? 1 : cands.size
+    if (afterSize < prevSize || state.placed[charId] !== undefined) {
+      for (const prevClue of prevClues) {
+        const params = prevClue.params as Record<string, unknown>
+        if (params.otherId === charId && !state.placed[prevClue.subject]) {
+          worklist.add(prevClue.subject)
+        }
+      }
+    }
+  }
+
+  return state
+}
 
 // Run forward constraint propagation (human-style deduction) and return what gets placed.
 // Uses 'partial' evaluateClue mode so relational clues only filter when the other
@@ -316,17 +433,15 @@ function synthesizeClues(
   const clues: Clue[] = []
   let clueIdCounter = 0
 
+  // Pre-compute once for O(1) cell lookup throughout synthesis
+  const cellById = new Map<string, Cell>(board.cells.flat().map(c => [c.id as string, c]))
+
   function makeId() {
     return `clue-${clueIdCounter++}`
   }
 
   function getCell(cellId: CellId): Cell {
-    for (const row of board.cells) {
-      for (const cell of row) {
-        if (cell.id === cellId) return cell
-      }
-    }
-    throw new Error(`Cell not found: ${cellId}`)
+    return cellById.get(cellId as string)!
   }
 
   // All candidate clues for charId — every entry is guaranteed TRUE for the intended solution.
@@ -384,6 +499,9 @@ function synthesizeClues(
           params: { otherId: other.id, direction: colDiff > 0 ? 'east' : 'west', n: Math.abs(colDiff) },
         })
       }
+
+      // NOTE: n_rows_direction_of would require colDiff === 0, which is impossible given
+      // the Latin square invariant (each character has a unique column). Not emitted.
     }
 
     // Guard: only return clues that are actually TRUE for the intended solution.
@@ -401,9 +519,9 @@ function synthesizeClues(
     return count
   }
 
-  // Forward-solve-guided synthesis: each round, add the clue that best reduces
-  // candidate cells for an unplaced character, preferring clues that narrow a
-  // character to exactly 1 cell (enabling placement and triggering chain deductions).
+  // Forward-solve-guided synthesis: each round uses forwardSolveState to get tight,
+  // fully-propagated candidates. This ensures pickBestClue operates on accurate state,
+  // which is critical for synthesis quality (success rate) on large boards.
   for (let round = 0; round < 50; round++) {
     const { placed, candidates } = forwardSolveState(board, characters, clues)
     const placedCount = Object.keys(placed).length
