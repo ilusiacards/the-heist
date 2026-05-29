@@ -522,22 +522,37 @@ function synthesizeClues(
   // Forward-solve-guided synthesis: each round uses forwardSolveState to get tight,
   // fully-propagated candidates. This ensures pickBestClue operates on accurate state,
   // which is critical for synthesis quality (success rate) on large boards.
-  for (let round = 0; round < 50; round++) {
+  //
+  // For large boards (numChars ≥ 9): use more rounds and disable OPT-3.
+  // The Latin square structure means the last character is always auto-placed once N-1
+  // are placed via forward deduction — so "nearly solved" placements are still winnable.
+  // For 11×11 (numChars=10): each attempt is cheap (~0.3s) so skip OPT-3 entirely.
+  const isLargeBoard = characters.length >= 9
+  const is11x11 = characters.length >= 10
+  const maxRounds = is11x11 ? 100 : isLargeBoard ? 70 : 50
+  // OPT-3 threshold: disabled for 11×11 (always continue to max rounds).
+  const opt3Threshold = is11x11 ? 0 : Math.max(1, characters.length - (isLargeBoard ? 5 : 3))
+
+  // Anticipatory relational clues: for large boards, once half the chars are placed,
+  // also consider same_room_as/not_same_room_as for UNPLACED other chars (future value).
+  // These have zero immediate reduction in partial mode but help once otherId is placed.
+  const ANTICIPATORY_TYPES = new Set<Clue['type']>(['same_room_as', 'not_same_room_as'])
+
+  for (let round = 0; round < maxRounds; round++) {
     const { placed, candidates } = forwardSolveState(board, characters, clues)
     const placedCount = Object.keys(placed).length
 
     if (placedCount === characters.length) break
 
-    // OPT-3: Early failure detection. If after 20 rounds fewer than (N-2) sospechosos
-    // are forward-placed, this placement is unlikely to yield a forward-solvable puzzle.
-    // Bail early to avoid wasting the remaining synthesis rounds.
-    if (round === 20 && placedCount < Math.max(1, characters.length - 3)) break
+    // OPT-3: Early failure detection — bail if too few chars placed at round 20.
+    if (round === 20 && placedCount < opt3Threshold) break
 
     let bestClue: Clue | null = null
     let bestRemaining = Infinity
     let bestIsPlacing = false
     let bestIsUnary = false
 
+    // Pass 1: find the best immediately-reducing clue (normal greedy selection).
     for (const char of seededShuffle([...characters], rng)) {
       if (placed[char.id]) continue
       const currentCands = candidates.get(char.id) ?? []
@@ -579,6 +594,33 @@ function synthesizeClues(
           bestRemaining = remainingCount
           bestIsPlacing = isPlacing
           bestIsUnary = isUnary
+        }
+      }
+    }
+
+    // Pass 2 (large boards only): if no reducing clue found, add an anticipatory
+    // relational clue for an unplaced character. For 11×11, do this from round 5
+    // (early seeding of room relationships before characters start being placed).
+    // These clues have zero immediate reduction but activate once otherId is placed.
+    const anticipatoryMinRound = is11x11 ? 5 : Math.ceil(characters.length / 2)
+    if (!bestClue && isLargeBoard && (placedCount >= anticipatoryMinRound || round >= anticipatoryMinRound)) {
+      outer: for (const char of seededShuffle([...characters], rng)) {
+        if (placed[char.id]) continue
+        for (const clue of candidateClues(char.id)) {
+          if (!ANTICIPATORY_TYPES.has(clue.type)) continue
+          const params = clue.params as { otherId?: string }
+          if (!params.otherId || placed[params.otherId]) continue // otherId already placed → was handled in pass 1
+          const isDuplicate = clues.some(c =>
+            c.subject === clue.subject &&
+            c.type === clue.type &&
+            JSON.stringify(c.params) === JSON.stringify(clue.params)
+          )
+          if (isDuplicate) continue
+          bestClue = clue
+          bestIsPlacing = false
+          bestIsUnary = false
+          bestRemaining = Infinity
+          break outer
         }
       }
     }

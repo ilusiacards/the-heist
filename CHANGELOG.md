@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1.0] - 2026-05-29
+
+### Added
+
+- **Nivel 38 (11×11, 10 personajes)**: El nivel más difícil del juego, generado como puzzle forward-solvable único con 16 pistas. Tardó 1606 intentos (~16 min) de síntesis offline para producirse.
+- **Síntesis mejorada para tableros grandes**: Para boards con ≥10 personajes: OPT-3 deshabilitado, 100 rondas de síntesis (vs 50), clues relacionales anticipatorios (`same_room_as`/`not_same_room_as`) como semillas tempranas para cadenas de deducción futuras.
+
+### Changed
+
+- **`synthesizeClues`**: Para `numChars ≥ 9` usa 70 rondas; para `numChars ≥ 10` usa 100 rondas con OPT-3 desactivado. El umbral de OPT-3 es `N-5` (antes `N-3`) para tableros 9×9.
+- **`generate.ts`**: `TOTAL_LEVELS` actualizado a 38 para incluir el primer nivel 11×11.
+
 ## [0.4.0.0] - 2026-05-29
 
 ### Added
